@@ -1,0 +1,17 @@
+[
+  {
+    "pid": 17772,
+    "create_time": 1792805903.2022448,
+    "purpose": "mcp-helper",
+    "install": "42c110343994",
+    "spawner_pid": 51264,
+    "spawner_create": 1792805895.9183822,
+    "registered_at": 1792805903.2422955,
+    "argv": "C:/Program Files/nodejs\\node.exe D:/ForensicsAgent/hermes/mcp-runtime/case-fs-2026.8.31/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js D:/forensics/cases",
+    "host": "",
+    "port": null,
+    "profile": "",
+    "hermes_home": "",
+    "isolated": false
+  }
+]

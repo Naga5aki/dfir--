@@ -1,0 +1,19 @@
+{
+  "label": "longfact_55k_256",
+  "timestamp": "2026-10-30T21:27:30",
+  "budget_requested": 2048,
+  "max_tokens": 256,
+  "prompt_tokens": 55483,
+  "completion_tokens": 150,
+  "cache_n": 0,
+  "prompt_tps": 832.4115114366901,
+  "decode_tps": 23.24919517215639,
+  "ttft_est_s": 66.69634324161073,
+  "wall_s": 73.113,
+  "finish_reason": "stop",
+  "reasoning_chars": 162,
+  "content_chars": 58,
+  "reasoning_tokens": 103,
+  "reasoning_tail": "用户要求只回答样本 Z9Q7 的采集时间和 SHA-256 前缀。需要从给定文本中提取。文本最后：样本编号 Z9Q7，采集时间 2026-10-30T23:59:59+08:00，证据文件 evidence_Z9Q7.bin，SHA-256 前缀 deadbeefcafebabe。\n需要只回答这两个字段。中文。不要多余。\n",
+  "content": "采集时间：2026-10-30T23:59:59+08:00；SHA-256 前缀：deadbeefcafebabe"
+}

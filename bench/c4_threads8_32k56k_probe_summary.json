@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-10-30T23:00:49",
+  "config": "64K, ngl64, q8/q8, no MTP, reasoning budget 2048",
+  "max_tokens": 512,
+  "runs_requested": 1,
+  "conditions": {
+    "32k": {
+      "target_tokens": 32000,
+      "n": 1,
+      "prompt_tokens": [
+        31739
+      ],
+      "completion_tokens": [
+        512
+      ],
+      "cache_n": [
+        0
+      ],
+      "prompt_tps": [
+        880.4373853370324
+      ],
+      "decode_tps": [
+        45.49264888648951
+      ],
+      "ttft_est_s": [
+        36.07110957338552
+      ],
+      "wall_s": [
+        47.684
+      ],
+      "decode_mean": 45.49264888648951,
+      "decode_min": 45.49264888648951,
+      "decode_max": 45.49264888648951,
+      "decode_stdev": null,
+      "prompt_tps_mean": 880.4373853370324,
+      "ttft_mean": 36.07110957338552
+    },
+    "56k": {
+      "target_tokens": 55900,
+      "n": 1,
+      "prompt_tokens": [
+        55597
+      ],
+      "completion_tokens": [
+        512
+      ],
+      "cache_n": [
+        0
+      ],
+      "prompt_tps": [
+        748.5101488239638
+      ],
+      "decode_tps": [
+        6.785449208356513
+      ],
+      "ttft_est_s": [
+        74.42425617808219
+      ],
+      "wall_s": [
+        150.336
+      ],
+      "decode_mean": 6.785449208356513,
+      "decode_min": 6.785449208356513,
+      "decode_max": 6.785449208356513,
+      "decode_stdev": null,
+      "prompt_tps_mean": 748.5101488239638,
+      "ttft_mean": 74.42425617808219
+    }
+  }
+}

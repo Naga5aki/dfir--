@@ -1,0 +1,819 @@
+{
+  "planner": {
+    "total": 26,
+    "passed": 26,
+    "failures": [],
+    "results": [
+      {
+        "q": 1,
+        "case": "mobile",
+        "ok": true,
+        "expected": {
+          "domain": "mobile",
+          "task": "locate",
+          "profile": "dfir-myos",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "mobile",
+          "task": "locate",
+          "profile": "dfir-myos",
+          "tier": "base"
+        },
+        "score": 0
+      },
+      {
+        "q": 2,
+        "case": "mobile",
+        "ok": true,
+        "expected": {
+          "domain": "mobile",
+          "task": "credential",
+          "profile": "dfir-myos",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "mobile",
+          "task": "credential",
+          "profile": "dfir-myos",
+          "tier": "complex"
+        },
+        "score": 4
+      },
+      {
+        "q": 3,
+        "case": "mobile",
+        "ok": true,
+        "expected": {
+          "domain": "mobile",
+          "task": "credential",
+          "profile": "dfir-myos",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "mobile",
+          "task": "credential",
+          "profile": "dfir-myos",
+          "tier": "complex"
+        },
+        "score": 4
+      },
+      {
+        "q": 4,
+        "case": "mobile",
+        "ok": true,
+        "expected": {
+          "domain": "mobile",
+          "task": "credential",
+          "profile": "dfir-myos",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "mobile",
+          "task": "credential",
+          "profile": "dfir-myos",
+          "tier": "complex"
+        },
+        "score": 4
+      },
+      {
+        "q": 5,
+        "case": "mobile",
+        "ok": true,
+        "expected": {
+          "domain": "mobile",
+          "task": "date",
+          "profile": "dfir-myos",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "mobile",
+          "task": "date",
+          "profile": "dfir-myos",
+          "tier": "complex"
+        },
+        "score": 3
+      },
+      {
+        "q": 6,
+        "case": "mobile",
+        "ok": true,
+        "expected": {
+          "domain": "mobile",
+          "task": "locate",
+          "profile": "dfir-myos",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "mobile",
+          "task": "locate",
+          "profile": "dfir-myos",
+          "tier": "base"
+        },
+        "score": 0
+      },
+      {
+        "q": 7,
+        "case": "mobile",
+        "ok": true,
+        "expected": {
+          "domain": "mobile",
+          "task": "count",
+          "profile": "dfir-myos",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "mobile",
+          "task": "count",
+          "profile": "dfir-myos",
+          "tier": "base"
+        },
+        "score": 1
+      },
+      {
+        "q": 8,
+        "case": "mobile",
+        "ok": true,
+        "expected": {
+          "domain": "mobile",
+          "task": "credential",
+          "profile": "dfir-max",
+          "tier": "deep"
+        },
+        "actual": {
+          "domain": "mobile",
+          "task": "credential",
+          "profile": "dfir-max",
+          "tier": "deep"
+        },
+        "score": 6
+      },
+      {
+        "q": 9,
+        "case": "pc",
+        "ok": true,
+        "expected": {
+          "domain": "pc",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "pc",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "score": 2
+      },
+      {
+        "q": 10,
+        "case": "pc",
+        "ok": true,
+        "expected": {
+          "domain": "pc",
+          "task": "credential",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "pc",
+          "task": "credential",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "score": 4
+      },
+      {
+        "q": 11,
+        "case": "pc",
+        "ok": true,
+        "expected": {
+          "domain": "pc",
+          "task": "timeline",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "pc",
+          "task": "timeline",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "score": 4
+      },
+      {
+        "q": 12,
+        "case": "network",
+        "ok": true,
+        "expected": {
+          "domain": "network",
+          "task": "network",
+          "profile": "dfir-pcap",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "network",
+          "task": "network",
+          "profile": "dfir-pcap",
+          "tier": "complex"
+        },
+        "score": 3
+      },
+      {
+        "q": 13,
+        "case": "network",
+        "ok": true,
+        "expected": {
+          "domain": "network",
+          "task": "credential",
+          "profile": "dfir-pcap",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "network",
+          "task": "credential",
+          "profile": "dfir-pcap",
+          "tier": "complex"
+        },
+        "score": 4
+      },
+      {
+        "q": 14,
+        "case": "memory",
+        "ok": true,
+        "expected": {
+          "domain": "memory",
+          "task": "locate",
+          "profile": "dfir-mem",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "memory",
+          "task": "locate",
+          "profile": "dfir-mem",
+          "tier": "base"
+        },
+        "score": 2
+      },
+      {
+        "q": 15,
+        "case": "memory",
+        "ok": true,
+        "expected": {
+          "domain": "memory",
+          "task": "credential",
+          "profile": "dfir-mem",
+          "tier": "deep"
+        },
+        "actual": {
+          "domain": "memory",
+          "task": "credential",
+          "profile": "dfir-mem",
+          "tier": "deep"
+        },
+        "score": 5
+      },
+      {
+        "q": 16,
+        "case": "reverse",
+        "ok": true,
+        "expected": {
+          "domain": "reverse",
+          "task": "reverse",
+          "profile": "dfir-max",
+          "tier": "deep"
+        },
+        "actual": {
+          "domain": "reverse",
+          "task": "reverse",
+          "profile": "dfir-max",
+          "tier": "deep"
+        },
+        "score": 6
+      },
+      {
+        "q": 17,
+        "case": "reverse",
+        "ok": true,
+        "expected": {
+          "domain": "reverse",
+          "task": "credential",
+          "profile": "dfir-re",
+          "tier": "deep"
+        },
+        "actual": {
+          "domain": "reverse",
+          "task": "credential",
+          "profile": "dfir-re",
+          "tier": "deep"
+        },
+        "score": 5
+      },
+      {
+        "q": 18,
+        "case": "generic",
+        "ok": true,
+        "expected": {
+          "domain": "generic",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "generic",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "score": 0
+      },
+      {
+        "q": 19,
+        "case": "generic",
+        "ok": true,
+        "expected": {
+          "domain": "generic",
+          "task": "unknown",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "generic",
+          "task": "unknown",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "score": 3
+      },
+      {
+        "q": 20,
+        "case": "generic",
+        "ok": true,
+        "expected": {
+          "domain": "generic",
+          "task": "timeline",
+          "profile": "dfir-max",
+          "tier": "deep"
+        },
+        "actual": {
+          "domain": "generic",
+          "task": "timeline",
+          "profile": "dfir-max",
+          "tier": "deep"
+        },
+        "score": 5
+      },
+      {
+        "q": 21,
+        "case": "linux",
+        "ok": true,
+        "expected": {
+          "domain": "linux",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "linux",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "score": 1
+      },
+      {
+        "q": 22,
+        "case": "mac",
+        "ok": true,
+        "expected": {
+          "domain": "mac",
+          "task": "credential",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "mac",
+          "task": "credential",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "score": 4
+      },
+      {
+        "q": 23,
+        "case": "cloud",
+        "ok": true,
+        "expected": {
+          "domain": "cloud",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "cloud",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "score": 1
+      },
+      {
+        "q": 24,
+        "case": "email",
+        "ok": true,
+        "expected": {
+          "domain": "email",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "email",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "score": 1
+      },
+      {
+        "q": 25,
+        "case": "database",
+        "ok": true,
+        "expected": {
+          "domain": "database",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "actual": {
+          "domain": "database",
+          "task": "locate",
+          "profile": "dfir",
+          "tier": "base"
+        },
+        "score": 1
+      },
+      {
+        "q": 26,
+        "case": "linux",
+        "ok": true,
+        "expected": {
+          "domain": "linux",
+          "task": "timeline",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "actual": {
+          "domain": "linux",
+          "task": "timeline",
+          "profile": "dfir",
+          "tier": "complex"
+        },
+        "score": 4
+      }
+    ]
+  },
+  "pending": {
+    "total": 4,
+    "passed": 4,
+    "failures": [],
+    "results": [
+      {
+        "text": "答案：TEST-VALUE",
+        "ok": true,
+        "expected": "OK",
+        "actual": "OK",
+        "has_next": false
+      },
+      {
+        "text": "答案：UNKNOWN",
+        "ok": true,
+        "expected": "EXHAUSTED",
+        "actual": "EXHAUSTED",
+        "has_next": false
+      },
+      {
+        "text": "答案：UNKNOWN",
+        "ok": true,
+        "expected": "UNKNOWN",
+        "actual": "UNKNOWN",
+        "has_next": true
+      },
+      {
+        "text": "证据：没有答案行",
+        "ok": true,
+        "expected": "NO_ANSWER",
+        "actual": "NO_ANSWER",
+        "has_next": true
+      }
+    ]
+  },
+  "overrides": {
+    "total": 3,
+    "passed": 3,
+    "failures": [],
+    "results": [
+      {
+        "check": "question-file-range",
+        "ok": true,
+        "actual": "questions-1-8.txt"
+      },
+      {
+        "check": "complex/deep sidecar",
+        "ok": true,
+        "q2": "complex",
+        "q8": "deep",
+        "q8_profile": "dfir-max"
+      },
+      {
+        "check": "case-profile override",
+        "ok": true,
+        "profile": "dfir-max",
+        "turns": 9,
+        "seconds": 300
+      }
+    ]
+  },
+  "routes": {
+    "total": 26,
+    "passed": 26,
+    "failures": [],
+    "results": [
+      {
+        "q": 1,
+        "profile": "dfir-myos",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 2,
+        "profile": "dfir-myos",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 3,
+        "profile": "dfir-myos",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 4,
+        "profile": "dfir-myos",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 5,
+        "profile": "dfir-myos",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 6,
+        "profile": "dfir-myos",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 7,
+        "profile": "dfir-myos",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 8,
+        "profile": "dfir-max",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 9,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "windows-loader",
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 10,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "windows-loader",
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 11,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "windows-loader",
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 12,
+        "profile": "dfir-pcap",
+        "config": true,
+        "skills": [
+          "wire-toutetu"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 13,
+        "profile": "dfir-pcap",
+        "config": true,
+        "skills": [
+          "wire-toutetu"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 14,
+        "profile": "dfir-mem",
+        "config": true,
+        "skills": [
+          "memory-forensics-local"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 15,
+        "profile": "dfir-mem",
+        "config": true,
+        "skills": [
+          "memory-forensics-local"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 16,
+        "profile": "dfir-max",
+        "config": true,
+        "skills": [
+          "android-app-forensics",
+          "mobile-ctf-pipeline"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 17,
+        "profile": "dfir-re",
+        "config": true,
+        "skills": [
+          "ida-reverse",
+          "android-malware-analysis"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 18,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 19,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 20,
+        "profile": "dfir-max",
+        "config": true,
+        "skills": [
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 21,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "linux-loader"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 22,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 23,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 24,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 25,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "digital-forensics"
+        ],
+        "missing": [],
+        "ok": true
+      },
+      {
+        "q": 26,
+        "profile": "dfir",
+        "config": true,
+        "skills": [
+          "linux-loader"
+        ],
+        "missing": [],
+        "ok": true
+      }
+    ]
+  },
+  "ok": true
+}

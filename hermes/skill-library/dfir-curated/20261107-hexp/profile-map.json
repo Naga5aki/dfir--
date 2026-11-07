@@ -1,0 +1,65 @@
+{
+  "version": "20261107-hexp",
+  "files": [
+    {
+      "source": "skills/security/myos-results-analysis/SKILL.md",
+      "dest": "skills/security/myos-results-analysis/SKILL.md",
+      "profiles": ["dfir-myos", "dfir-max"]
+    },
+    {
+      "source": "skills/security/myos-results-analysis/SKILL.stub.md",
+      "dest": "skills/security/myos-results-analysis/SKILL.md",
+      "profiles": ["dfir", "dfir-mem", "dfir-pcap", "dfir-re"]
+    },
+    {
+      "source": "skills/security/myos-results-analysis/references/myos-secondary-card.md",
+      "dest": "skills/security/myos-results-analysis/references/myos-secondary-card.md",
+      "profiles": ["dfir-myos", "dfir-max"]
+    },
+    {
+      "source": "skills/security/bill-flow-analysis/SKILL.md",
+      "dest": "skills/security/bill-flow-analysis/SKILL.md",
+      "profiles": ["dfir-pcap", "dfir-max"]
+    },
+    {
+      "source": "skills/security/bill-flow-analysis/references/bill-flow-template.md",
+      "dest": "skills/security/bill-flow-analysis/references/bill-flow-template.md",
+      "profiles": ["dfir-pcap", "dfir-max"]
+    },
+    {
+      "source": "skills/security/forensic-record-draft/SKILL.md",
+      "dest": "skills/security/forensic-record-draft/SKILL.md",
+      "profiles": ["dfir", "dfir-myos", "dfir-max"]
+    },
+    {
+      "source": "skills/security/forensic-record-draft/references/four-record-types.md",
+      "dest": "skills/security/forensic-record-draft/references/four-record-types.md",
+      "profiles": ["dfir", "dfir-myos", "dfir-max"]
+    },
+    {
+      "source": "skills/security/forensic-record-draft/scripts/md_to_gongwen_docx.py",
+      "dest": "skills/security/forensic-record-draft/scripts/md_to_gongwen_docx.py",
+      "profiles": ["dfir", "dfir-myos", "dfir-max"]
+    },
+    {
+      "source": "references/evidence-record.md",
+      "dest": "skills/security/digital-forensics/references/evidence-record.md",
+      "profiles": ["dfir", "dfir-max", "dfir-mem", "dfir-myos", "dfir-pcap", "dfir-re"]
+    },
+    {
+      "source": "references/evidence-record.md",
+      "dest": "skills/forensics/android-app-forensics/references/evidence-record.md",
+      "profiles": ["dfir-myos", "dfir-max"]
+    },
+    {
+      "source": "references/server-artifact-checklist.md",
+      "dest": "skills/forensics/linux-loader/references/server-artifact-checklist.md",
+      "profiles": ["dfir", "dfir-max", "dfir-mem", "dfir-myos", "dfir-pcap", "dfir-re"]
+    },
+    {
+      "source": "references/server-artifact-checklist.md",
+      "dest": "skills/forensics/windows-loader/references/server-artifact-checklist.md",
+      "profiles": ["dfir", "dfir-max", "dfir-mem", "dfir-myos", "dfir-pcap", "dfir-re"]
+    }
+  ]
+}

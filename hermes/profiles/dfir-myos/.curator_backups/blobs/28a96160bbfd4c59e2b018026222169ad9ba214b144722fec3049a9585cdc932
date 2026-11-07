@@ -1,0 +1,134 @@
+---
+name: android-app-forensics
+description: Use when Android userdata/手机检材需按 App 定位数据库、MMKV、缓存、聊天记录或图片证据；含 MYOS 解析库入口与手机取证答题校验规则.
+---
+
+# Android App Forensics
+
+AI 主导的 Android 手机检材分析。目标：**先走 MYOS 解析结果，再回落文件系统**，把"猜 App / 猜包名 / 猜表"的轮次压到 0。
+
+## 铁律（违反即浪费 2–6 轮）
+
+1. **先解析库，后文件系统。** `data\MApps.mfs`、`data\apklist.mfs`、`data\MApps\<App>{GUID}.mfs` 是 MYOS 已解析好的结果，优先查它们。
+2. **一切名字必须来自枚举。** 包名、App 名、表名、库文件名都要来自 `apklist.mfs` / `MApps.mfs` / 目录枚举，**禁止凭记忆写**（本次把 DeepSeek 猜成 `com.bytedance.dreamina`）。
+3. **`.mfs` 只能走 MCP `sqlite_query`。** 用 `python sqlite3` 打开必报 `file is not a database`（已实测），不要重试。
+4. **图片不要 `read_file`。** 返回 `is_image: false, content: ""`，直接调 `ocr.ps1`。
+5. **大返回先落盘。** 超过 2000 字符的 JSON（如结果总览）先 `write` 到 `notes\`，再分段读；一次性灌上下文会被截断在关键字段之前。
+6. **子库缺失立刻回落原始明文库。** MYOS 只解析了部分 App（本案 17 个子库覆盖 DeepSeek/JianYing/HuanYou/SouGouInput/JiaoGuan12123/MiCloud/XiaoMiMarket，**不含即梦、抖音**）。若 `MApps` 下找不到目标 App 的子库，直接走 `<root>\data\data\<pkg>\databases\*.db`，用 `python sqlite3` 只读打开（`file:...?mode=ro`，明文可直接查）。**不要为了找子库把 17 个库全枚举一遍**——那会烧光预算还得不到答案（本次 Q9 就是这么失败的）。
+7. **题面【答案格式】里的示例值不是答案。** `【答案格式：seedance1.5pro】` 只是格式示范；照抄会得到一个格式完全正确、内容完全错误的答案（本次 Q9 输出 `seedance1.5pro`，实际是 `seedance1.0fast`）。任何结论必须有库里读出的原始字段支撑，没有就写"未取到"。 
+8. **先读数据源地图，不要枚举。** `D:\forensics\cases\notes\device_map.summary.txt` 由 `hermes\bin\myos_appmap.py` 扫出：第三方包、每个明文库的表与行数、含聊天库的包、媒体目录计数、工程/草稿目录实测值（59 包 96 库，0.9 秒）。开局读它；需要细节再读 `device_map.json` 对应条目。**不要 `ls data/data` 或 `find *.db`**。
+9. **每题一个收口文件。** 写 `notes\pending-<题号>.md`（题号/答案/证据/已排除/下一轮），字段名固定为 `答案：`。十题合成一个文件会导致无法逐题判定、重试与评测。
+10. **明文库只用 `dbq.py` 取数。** `python D:\ForensicsAgent\hermes\bin\dbq.py "<root>\...\x.db" --tables` / `... "SELECT ..."`（只读、自动展开 `<root>`、首行列名）。不要写多行 `python -c`——Windows 引号嵌套必错，本次实测每错一次浪费 1–2 轮。`execute_code` 在单查询模式会被直接 BLOCKED，不要尝试。
+11. **答题隔离：答案只能来自检材或数据源地图。** 只读 `notes\device_map.*`、`notes\tool-map.md` 与本题 `pending-<题号>.md`；**禁止**读 `notes` 下其它文件、`_solve-*.log`、`cases\archive`、以及任何 gold/eval/参考答案文件。历史结论照抄会让评测失效、错误不可复现；题面逐字取自 `notes\questions-<范围>.txt`，按题号取行，不要靠猜题意。
+
+## 原始文件系统的 root 在哪（不要 ls 到处找）
+
+`<root>` 只有一个权威来源：`D:\ForensicsAgent\hermes\state\myos_mount.json` 的 `rootPath`
+（形如 `C:\osmap\<GUID>_<时间戳>\Root\userdata`）。
+
+- 文件不存在 → 先跑 `python D:\ForensicsAgent\hermes\bin\myos_mount.py mount`，再读它。
+- **不要**去 `D:\MYOS\Case\...\dev\userdata.tar\` 下面找 `data\data`、`files\`、`attachments\`：检材目录只有 MYOS 的 `.mfs` 与索引库，原始文件系统只在 `C:\osmap` 挂载点。
+- 拿到 root 后：App 私有数据 = `<rootPath>\data\data\<pkg>\`。
+
+## 开局 6 步（不可换序）
+
+```text
+1. 读 D:\ForensicsAgent\hermes\state\myos_mount.json 的 rootPath；不存在 → python D:\ForensicsAgent\hermes\bin\myos_mount.py mount
+2. query_open_cases → query_materials 取 caseId / caseMaterialId
+3. query_phone_forensics_results_overview(caseMaterialId)  ← 用 tool_search 返回的精确名
+   └ 若被截断：落盘 notes/overview.raw.json，分 3 段读，重点找 sqliteQueryHints
+4. sqlite_query(MApps.mfs): PRAGMA table_info(TBL_APPDATA_MANAGER) → SELECT *
+   └ 得到 App 名 / 包名 / 子库映射，写入 notes/datasources.md
+5. sqlite_query(apklist.mfs): 包名 ↔ App 中文名
+   └ 0 字节空文件（sqlite_master 返回 0 行）→ 改用 ls data/data（过滤 com.android* / android.* / com.miui* / com.xiaomi* 前缀）拿第三方包名清单，App 中文名走 Platform.mfs 或 MYOS 桌面应用清单
+6. 设备级信息（Android ID / 型号 / 系统版本）走 MYOS 桌面「设备信息」面板或 query_current_node_data
+```
+
+## 目录入口
+
+| 目标 | 路径 |
+|---|---|
+| App 私有数据 | `<root>\data\data\<pkg>\` |
+| 数据库 | `...\databases\*.db`（含 `-wal` / `-journal`，先读 wal） |
+| 键值 | `...\shared_prefs\*.xml`、`...\files\mmkv\*.mmkv` |
+| 媒体 | `<root>\data\media\0\`（DCIM / Movies / Download / Pictures） |
+| 无线网络 | `data\misc\apexdata\com.android.wifi\WifiConfigStore.xml` |
+| 设备账户 | `data\system\users\0\settings_ssaid.xml`（每 App key，不是设备 Android ID） |
+| 输入法 | `...\com.sohu.inputmethod.sogou\databases\` |
+| MYOS 解析子库 | `<MYOS案件>\dev\<检材>\data\MApps\<App>{GUID}.mfs` |
+
+## 存储形态判定树
+
+```text
+MApps 下有该 App 子库？          → sqlite_query 查 <App>{GUID}.mfs
+MApps 下无该 App 子库？          → 立刻回落 <root>\data\data\<pkg>\databases\*.db（明文，python sqlite3 只读可开）
+有 databases/*.db 明文？        → sqlite3 直查
+有 files/mmkv/*.mmkv？         → MMKV（不是 XML），strings / hexdump 找 key（简记事邮箱即此类）
+只有 shared_prefs/*.xml？      → SharedPreferences
+只有 -wal 没有主库内容？        → 先解析 wal
+文本全局搜零命中？              → 三选一：图片(OCR) / 加密库(decrypt_partition) / App 子库
+```
+
+## 题型 → 直查路径
+
+| 题面关键词 | 直接查 | 备注 |
+|---|---|---|
+| 最后连接某 SSID 的时间 | `WifiConfigStore.xml` 的 `LastConnectedTime` | 毫秒时间戳，必须脚本换算成 `Asia/Shanghai` |
+| 某 App 的登录邮箱/账号 | App 的 `mmkv` 或 `shared_prefs` | 简记事在 `files/mmkv/mmkv.default` |
+| 某个文件名 / 提示词文件的 MD5 | `data\media\0\` 或全局文件名搜索 | **在原始路径算哈希**，不要对副本算 |
+| AI 生成内容的条数 | `com.bytedance.dreamina\databases\dreamina.db` 的 `aigc_data` + `data\media\0\` 文件枚举 | 即梦未被子库解析，走原始库；本案例 3 条 |
+| 某个 `history_record_id` 的模型名 | 同上库同表，`data_json` 里的 `model_info.model_name` | 本案例 `Seedance 1.0 Fast` → `seedance1.0fast` |
+| App 中文名 / 引流软件 | `apklist.mfs`（包名↔App 名） | 一条 SQL，不要靠猜；**先确认非 0 字节**，空文件时走 ls data/data + Platform.mfs |
+| 剪辑工程数（剪映） | `files\newdrafts\` 下列目录（UUID 命名者为用户工程） | 剪映子库只有 BROWSE_MULTIMEDIA / BROWSE_SEARCH / BROWSE_ACCOUNT 三表，**无工程表**；`files\draft` 只有 placeholder PNG（非工程）；`AlbumToVideoId` 类自动目录不计 |
+| Android ID / 设备信息 | 设备信息面板 / `query_current_node_data` | 不要逐条读 ssaid.xml |
+| 中签截图 / 余额 / 认购金额 | 图库 `DCIM_*.jpg` → `ocr.ps1` | 取数字，不逐字抄；中文会插空格 |
+| 聊天记录条数 / 发送失败条数 | `<pkg>\files\<uid>_<hex>\msg_0.db` → `message` 表；`status=3` 失败、`2` 正常；`sid`=对方 user_id | 昵称→user_id 先查同目录 `im.db` 的 `userinfo`；`databases\elp_msg.db` 只有 `msg(workId,expireTime)`，**不是聊天内容** |
+| 售卖 API / 网站端口 | 聊天文本里的 URL 或浏览器历史 | 取 URL 的 `:port` |
+| 直播软件搜索关键词 | `<pkg>\files\mmkv\dbb_ugc_editor_home_history_biz` 的 `_search_history_info_key`（JSON，字段 `name`） | **`dbb_search_tab_key` 是搜索页签（综合/团购/商品…），不是关键词**，本检材实测关键词只在上面的 history 文件 |
+| 文件加密 / 加固工具包名 | 第三方包清单里 `com.aijiami.cn` 这类应用 | 用户数据为空也成立；算法走 jadx |
+| 加密算法 / 模式 | 先把 APK 复制到工作区 → `powershell -File D:\ForensicsAgent\hermes\bin\ensure-jadx.ps1 -Apk <APK>` → 8650 通后用 MCP 反编译 `EncryptionUtils` | 不要用 `Start-Process` 起 jadx（GUI 子进程随终端回收，实测 30s 消失），脚本内部走 WMI；也不要直接打开检材里的 APK（jadx 会写缓存）。兜底：`python D:\ForensicsAgent\hermes\bin\dex_strings.py <apk>` 扫 dex 常量 |
+| 剪映 / 抖音工程目录名 | `files\newdrafts`（UUID 目录）才是工程本体 | `draft` 是占位图目录，`tmp` 是缓存；以实测字段为准，不要照抄目录名 |
+| 口述密码 | 音频转写 / 试听 + Keepass 线索（详见下方"口述密码（音频）"行） | 注意大小写与 `@` |
+| 二维码 / 下载链接 | `python D:\ForensicsAgent\hermes\bin\qr_scan.py "<视频或图片>" [步长秒=0.5] [最多帧=200]` | 本机无 ffmpeg/zbar，脚本用 cv2 抽帧解码；无二维码时说明链接是画面文字，抽帧后 `ocr.ps1` 读文字。顺序不能反（先解密再抽帧） |
+| 手机号 / 登录名 | 顺序：短信 `mmssms.db` → 通话 `calllog.db` → 联系人 `contacts2.db` → 直播/业务 App 的 `files\mmkv\config_biz` → 剪映 `files\home_feed_cache\key_*.json` 的 `web_uid` → 浏览器表单 `Web Data` | `web_uid` 常是「手机号 + 4 位随机数」（实测 `1354235344600631` → 前 11 位即手机号）；不要假定 SIM 号 = 登录号；微信/支付宝库为加密库，明文中查不到不代表没有；通讯录/短信为空时不要去扫系统黄页库（`yellow_pages.dat` 全是客服号，纯噪声） |
+| 视频里的链接 / 画面文字 | `python D:\ForensicsAgent\hermes\bin\qr_scan.py "<视频>" 1 200`；无码再 `python D:\ForensicsAgent\hermes\bin\video_frames.py "<视频>" <输出目录> 20 12` + `ocr.ps1 -Path <输出目录>` | 先判断视频是不是题材相关（本检材 `Movies\直播素材\待剪辑\算力宣传视频.mp4` 实为 Stable Diffusion 演示，与矿机无关）；无关就换别的视频或换来源，别在 OCR 上耗预算。**链接类题常见链式路径：聊天记录提到 → 聊天里的宣传视频 →（视频若加密则先解密）→ 扫码/OCR**；三处都没有就写 `答案：UNKNOWN` 并注"需联网/人工复核"，不要反复调帧率 |
+| 加密素材（`.encrypted` / `.tmp.encrypted`）解密 | `python D:\ForensicsAgent\hermes\bin\aijiami_decrypt.py "<密文>" "<输出路径>" "<密码>"`；先 `--probe` 只解前 64 字节验密码（输出 `mp4=True` 即对） | 算法：AES-256-CBC/PKCS7，key=SHA-256(password)，IV=`juhetianji123456`；解密后按真实内容判断类型（无后缀也先按视频试）。**顺序：解密 → 抽帧/扫码/OCR**，不要对密文直接 `qr_scan` |
+| 口述密码（音频） | `<root>\data\media\0\Recordings\*.wav` 存在即说明密码靠听；本机无 ASR 引擎 | 没有转写能力就写 `答案：UNKNOWN`，不要猜；可在"下一轮"里写明"需人工听写/需接 whisper" |
+
+## 反模式（本次踩过，别重复）
+
+- ✗ 开局就 `ls data/data | grep -v com.android` 看包名 → 烧 token 且不知道 App 名（apklist.mfs 为空时例外：那是唯一包名清单，见开局第 5 步）
+- ✗ `cat` 3000 字符 XML 全文 → 用 `grep` 只取命中行
+- ✗ 同一个关键字换 3 种拼法继续全局搜 → 2 次零命中就换分支
+- ✗ Windows 下 python sqlite3 用单斜线 URI `file:C:/...?mode=ro` 打开原生 .db → 直接报 `unable to open database file`；URI 要 `file:///C:/...` 三斜线，或把 .db 拷到临时目录再开（不要对证据路径拿可写句柄）
+- ✗ 只查一个 App 就回答数量类题 → 至少两个来源
+- ✗ 结论写"待确认"就交付 → 时间戳/哈希必须当场算清写死
+- ✗ 把 `MApps` 下 17 个子库挨个 `sqlite_master` 枚举找目标 App → 目标不在就永远找不到，烧光预算（Q9 实测 36 次调用后仍空手）
+- ✗ 把 `databases\elp_msg.db` 当聊天库 → 它只有 `msg(workId,expireTime)`；真正的消息在 `files\<uid>_<hex>\msg_0.db`（Q11 因此多花 10+ 轮）
+- ✗ 工程目录名靠猜（`draft` / `drafts` / `newdrafts` / `tmp` 都试一遍）→ 先读 device_map 的实测行
+- ✗ `sqlite_query` 返回 `{"error":"not authorized"}` 还连续重试 PRAGMA 变体 → `.mfs` 上 `PRAGMA table_info` 可能被禁（Platform.mfs 实测），第 2 次失败改走 `SELECT name FROM sqlite_master` + `SELECT * FROM <表> LIMIT 1`（看行键取列名）；`python3 sqlite3` 直连只用于明文库 `.db`，对 `.mfs` 必报 `file is not a database`
+- ✗ 十题写进同一个 `pending-1-10.md` → 预算耗尽后无法逐题重试（本次 11–20 题 0 收口）
+- ✗ 把"用户数据为空"当成"不是目标应用" → 加固/加密工具往往只有 `cache` 与 `code_cache`，包名本身就是答案
+- ✗ 看到 mmkv 文件名像就不再验证内容 → 本检材 `dbb_search_tab_key` 存的是页签、`dbb_ugc_editor_home_history_biz` 里才是搜索历史；**先 strings 看内容，键名只当线索**
+- ✗ 对 `.encrypted` 密文直接扫码/OCR → 全是乱码；必须先按上面的解密行解出明文再抽帧（实测 87 MB 素材解密后才可播）
+- ✗ 解密素材扫码 0 命中还继续换步长/帧数重扫 → 说明该素材根本不含二维码，换素材或换题链，别在一处磨
+
+## 收口校验（提交前逐条过）
+
+1. 时间类：原始值 + 换算结果 + 时区，三者齐全。
+2. 哈希类：原始路径 + 算法 + 截取规则，可复现。
+3. 数量类：两个来源，数量一致或解释差异。
+4. 名称类：来自枚举，有包名/表名支撑。
+5. 答案格式：严格符合题面【答案格式】，大小写/位数/连接符不漏；**但绝不用格式里的示例值当答案**。
+6. 落地：写入 `notes\pending-<题号>.md`，`答案：` 行只有一个最终值；不确定写 `答案：UNKNOWN`。没有这个文件等于本题未作答。
+
+## 相关文件
+
+- 数据源地图（开局先读）：`D:\forensics\cases\notes\device_map.summary.txt`；全量 `device_map.json`
+- 题面：`D:\forensics\cases\notes\questions-11-20.txt`（`题号|题干` 一行一题）
+- 金标与评测：`D:\ForensicsAgent\hermes\state\eval\gold-11-20.json`、`hermes\bin\eval_gold.py`（金标**不在** notes 下，禁止读取）
+- 工具真名与易错点：`D:\forensics\cases\notes\tool-map.md`
+- 本案数据源地图：`D:\forensics\cases\notes\datasources.md`
+- 已排除路径：`D:\forensics\cases\notes\rejects.md`
+- OCR：`D:\ForensicsAgent\hermes\bin\ocr.ps1 -Path <文件|目录> [-Out <txt>]`
+- 索引脚本：`D:\ForensicsAgent\hermes\bin\myos_appmap.py`

@@ -1,0 +1,32 @@
+# 微信（com.tencent.mm）取证要点
+
+## UIN / 账号
+
+- 权威字段：`Wechat{GUID}.mfs` 的 `TBL_PR_APP_AUTHINFO`，AUTH JSON 列里 `authUin` 即 UIN 原值。
+- 交叉验证：`TBL_PR_WEIXIN_IM_ACCOUNT`（`ACCOUNT` wxid、`ACCOUNT_ID`、`NAME` 昵称、`MSISDN`）——UIN 与 wxid 以该表两列同时对上才算高置信。
+- 账号目录：`<root>\data\data\com.tencent.mm\MicroMsg\<32位md5>\`，每账号一个 md5 目录；无业务数据的 md5 目录（只有 `EnResDown.db`）是残留，跳过。mmkv 文件名前缀常与 UIN/ACCOUNT_ID 一致，可当旁证。
+- `TBL_PR_WEIXIN_IM_LOGINDEVICE` 可能为空表（rowCount 0）——设备登录信息不代表一定解析出来，空表不算证据缺失。
+
+## 聊天数据库文件名
+
+- 新版：`MicroMsg\<md5>\EnMicroMsg.db`（同目录 `EnMicroMsg.db.ini`，ini 内含 createmd5；`*.db.li` 是库元数据，可见 message/conversation 表名）。
+- 旧版/分库：`msg_*.db` 分片 + 同目录 `im.db`（userinfo：昵称→user_id）。
+- 判断哪个 md5 是活跃账号：看目录内 `account.bin`、`attachment/`、`record/` 等非空业务目录；`EnMicroMsg.db.ini` 存在即该账号主库。
+
+## 数据库加密密钥
+
+- 常见位置：`MicroMsg\<md5>\keyfile`。该文件不在目录顶层时，候选位置：`<md5>/mmkv_private/`（4 个 md5 命名文件）、`<md5>/SecData.db`、`KeyInfo.bin`——先 `strings`/`sqlite` 逐个看再下结论。
+- 密钥属敏感数据：只报告位置与存在性（可给掩码），不原样写入聊天或报告。
+
+## device_name（手机设备名）
+
+- MIUI 设备名在系统属性 `persist.sys.device_name`（用户在设置里可改）。取证镜像里该属性快照常落在 `Root/adb/lspd/log/props.txt`（LSPosed 启动日志）：`[persist.sys.device_name]: [Redmi 6 Pro]`。settings_ssaid/secure.xml 里**没有**该键，不要在那里找。
+- 交叉验证：微信 `TBL_PR_APP_AUTHINFO` AUTH JSON 的 `devTag`（base64，含机型串）与 `ro.product.device`。
+
+## 笔记/重要日子类 App 存储（答题候选源）
+
+- MIUI 备忘录 `com.miui.notes`：`databases/note.db`、`todo.db`（sqlite 明文，走 dbq.py）。
+- Days Matter `com.clover.daysmatter`：数据在 `files/default.realm`（Realm 二进制），`databases/` 里只有 appcenter 埋点——别被 databases 目录误导。
+- 广告壳记事 App（如 com.lazy.note）可能只有 SDK/WebView 文件，无用户笔记：先 ls 全目录确认再排除。
+- Realm 文本提取：`python3 -c` 读 bytes 后 `data.decode('utf-8','ignore')` 再 `re.findall(r'[\u4e00-\u9fff\w\\-]{4,}', text)`；**不要在 rb'' 字节模式里写 `\u4e00`**（rb 字符串无 unicode 转义，直接 PatternError）。
+

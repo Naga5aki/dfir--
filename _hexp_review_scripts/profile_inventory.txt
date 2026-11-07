@@ -1,0 +1,304 @@
+========================================================================
+dfir
+memory_enabled=False
+max_turns=18 budget=900
+context=65536 model=qwen3.8-27b-forensics
+  mcp case_fs enabled=True
+    command=C:/Program Files/nodejs/node.exe
+    include:
+      - read_file
+      - read_multiple_files
+      - list_directory
+      - directory_tree
+      - search_files
+      - get_file_info
+  disabled_count=87
+  [enabled] security/android-malware-analysis 15896B | Use when APK需JADX、Java/Smali逆向或安卓恶意行为分析.
+  [enabled] security/attack-analysis 9320B | Use when analyzing server attack logs and producing a Markdown incident timeline/report from web access logs, applicatio
+  [enabled] security/ctf-misc 3186B | Use when CTF杂题、RSA、编码、隐写或压缩包需本地工具分析.
+  [enabled] security/ctf-misc-analysis 34965B | "Use for CTF-misc files: stego, embedded data, containers, and offline network captures (PCAP/PCAPNG)."
+  [enabled] security/cyber-library 1882B | Use when 本地专用技能不足、需检索818社区安全参考库.
+  [enabled] security/digital-forensics 8894B | "Use when triaging files and preserving evidence."
+  [DISABLED] security/gated-knowledge-promotion 37942B | Use when promoting staged knowledge into an official store.
+  [DISABLED] security/hermes-environment-audit 10015B | Use when 需核查当前Hermes profile的工具、MCP与依赖.
+  [enabled] security/ida-reverse 2920B | Use when EXE/ELF/原生so需IDA逆向、交叉引用或反编译.
+  [enabled] security/memory-forensics-local 3527B | Use when 内存镜像需用本地memforensics或Volatility分析.
+  [enabled] security/myos-results-analysis 3668B | Use when MYOS已有取证结果需二次分析、查询或关联.
+  [DISABLED] security/phase-gated-docx-learning 60988B | Use when running SecurityLab 方案A gated docx learning phases.
+  [enabled] security/wire-toutetu 6617B | Use when 离线PCAP需流量、WebShell或隧道分析.
+  [enabled] forensics/linux-loader 7232B | Use when Linux镜像或服务器日志需只读取证和入侵排查.
+  [DISABLED] forensics/utm-forensic-cli 18935B | Use when an agent must perform read-only disk-image forensics on macOS by controlling an isolated UTM Linux VM through u
+  [enabled] forensics/windows-loader 6106B | Use when Windows镜像需只读挂载、工件提取或取证.
+========================================================================
+dfir-max
+memory_enabled=False
+max_turns=26 budget=1500
+context=65536 model=qwen3.8-27b-forensics
+  mcp didctf-ag-1861d72d enabled=True
+    url=https://forensics.didctf.com/api/arena/mcp
+    tools={'resources': False, 'prompts': False}
+  mcp ida enabled=True
+    url=http://127.0.0.1:8737/mcp
+    include:
+      - open_database
+      - execute_python
+      - reference
+      - list_databases
+      - save_database
+      - close_database
+  mcp myos-forensics enabled=True
+    command=D:/MYOS/Client/tools/mcp/myos_mcp_server.exe
+    include:
+      - myos-forensics.health_check_dbus
+      - myos-forensics.query_cases
+      - myos-forensics.query_open_cases
+      - myos-forensics.open_case
+      - myos-forensics.query_materials
+      - myos-forensics.load_case
+      - myos-forensics.add_image_material
+      - myos-forensics.add_disk_material
+      - myos-forensics.add_file_collection_material
+      - myos-forensics.query_computer_forensics_results_overview
+      - myos-forensics.query_device_info
+      - myos-forensics.query_device_mount_path
+      - myos-forensics.query_current_node_data
+      - myos-forensics.quick_search_files
+      - myos-forensics.sqlite_query
+      - myos-forensics.create_file_index_task
+      - myos-forensics.quick_search_content
+      - myos-forensics.global_search_content
+      - myos-forensics.query_task_status
+      - myos-forensics.wait_task_completion
+      - myos-forensics.query_phone_forensics_results_overview
+      - myos-forensics.query_encrypt_types
+      - myos-forensics.decrypt_partition
+      - myos-forensics.query_decrypt_task_status
+      - myos-forensics.restart_computer_forensics
+  mcp case_fs enabled=True
+    command=C:/Program Files/nodejs/node.exe
+    include:
+      - read_file
+      - read_multiple_files
+      - list_directory
+      - directory_tree
+      - search_files
+      - get_file_info
+  mcp jadx enabled=True
+    command=C:\Users\TWK\.local\bin\uv.exe
+    tools={}
+  mcp wiremcp enabled=True
+    command=node
+    tools={}
+  mcp memforensics enabled=True
+    command=D:\CTF_Misc_Tools\Forensics\volatility\mem-forensics-mcp\.venv\Scripts\python.exe
+    tools={}
+  mcp lovelyspark enabled=True
+    url=http://127.0.0.1:8765/mcp
+    tools={}
+  mcp lovelymem enabled=True
+    url=http://127.0.0.1:17621/mcp
+    tools={}
+  disabled_count=87
+  [enabled] security/android-malware-analysis 15896B | Use when APK需JADX、Java/Smali逆向或安卓恶意行为分析.
+  [enabled] security/attack-analysis 9320B | Use when analyzing server attack logs and producing a Markdown incident timeline/report from web access logs, applicatio
+  [enabled] security/ctf-misc 3186B | Use when CTF杂题、RSA、编码、隐写或压缩包需本地工具分析.
+  [enabled] security/ctf-misc-analysis 34965B | "Use for CTF-misc files: stego, embedded data, containers, and offline network captures (PCAP/PCAPNG)."
+  [enabled] security/cyber-library 1882B | Use when 本地专用技能不足、需检索818社区安全参考库.
+  [enabled] security/digital-forensics 8894B | "Use when triaging files and preserving evidence."
+  [DISABLED] security/gated-knowledge-promotion 37942B | Use when promoting staged knowledge into an official store.
+  [DISABLED] security/hermes-environment-audit 10015B | Use when 需核查当前Hermes profile的工具、MCP与依赖.
+  [enabled] security/ida-reverse 2920B | Use when EXE/ELF/原生so需IDA逆向、交叉引用或反编译.
+  [enabled] security/memory-forensics-local 3527B | Use when 内存镜像需用本地memforensics或Volatility分析.
+  [enabled] security/myos-results-analysis 9765B | Use when MYOS已有取证结果需二次分析、查询或关联；含手机与计算机（电脑/E01/磁盘镜像）检材.
+  [DISABLED] security/phase-gated-docx-learning 60988B | Use when running SecurityLab 方案A gated docx learning phases.
+  [enabled] security/wire-toutetu 6617B | Use when 离线PCAP需流量、WebShell或隧道分析.
+  [enabled] forensics/android-app-forensics 17004B | Use when Android userdata/手机检材需按 App 定位数据库、MMKV、缓存、聊天记录或图片证据；含 MYOS 解析库入口与手机取证答题校验规则.
+  [enabled] forensics/didctf-arena 3114B | "DIDCTF arena: whoami, list/get, submit answers and notes; no writeup while solving."
+  [enabled] forensics/linux-loader 7812B | Use when Linux镜像/计算机检材需只读取证、挂载或入侵排查（含 openKylin/E01/MYOS 计算机结果）.
+  [enabled] forensics/mobile-ctf-pipeline 13172B | 手机取证（Android）流水线：索引→定位→取数→收口；含微信 key、图片二维码、VeraCrypt 链.
+  [DISABLED] forensics/utm-forensic-cli 18935B | Use when an agent must perform read-only disk-image forensics on macOS by controlling an isolated UTM Linux VM through u
+  [enabled] forensics/windows-loader 6626B | Use when Windows镜像/计算机检材需只读挂载、工件提取或取证（含 E01/MYOS 计算机结果）.
+========================================================================
+dfir-mem
+memory_enabled=False
+max_turns=26 budget=1500
+context=65536 model=qwen3.8-27b-forensics
+  mcp memforensics enabled=True
+    command=D:\CTF_Misc_Tools\Forensics\volatility\mem-forensics-mcp\.venv\Scripts\python.exe
+    tools={}
+  mcp case_fs enabled=True
+    command=C:/Program Files/nodejs/node.exe
+    include:
+      - read_file
+      - read_multiple_files
+      - list_directory
+      - directory_tree
+      - search_files
+      - get_file_info
+  mcp lovelymem enabled=True
+    url=http://127.0.0.1:17621/mcp
+    tools={}
+  disabled_count=87
+  [enabled] security/android-malware-analysis 15896B | Use when APK需JADX、Java/Smali逆向或安卓恶意行为分析.
+  [enabled] security/attack-analysis 9320B | Use when analyzing server attack logs and producing a Markdown incident timeline/report from web access logs, applicatio
+  [enabled] security/ctf-misc 3186B | Use when CTF杂题、RSA、编码、隐写或压缩包需本地工具分析.
+  [enabled] security/ctf-misc-analysis 34965B | "Use for CTF-misc files: stego, embedded data, containers, and offline network captures (PCAP/PCAPNG)."
+  [enabled] security/cyber-library 1882B | Use when 本地专用技能不足、需检索818社区安全参考库.
+  [enabled] security/digital-forensics 8894B | "Use when triaging files and preserving evidence."
+  [DISABLED] security/gated-knowledge-promotion 37942B | Use when promoting staged knowledge into an official store.
+  [DISABLED] security/hermes-environment-audit 10015B | Use when 需核查当前Hermes profile的工具、MCP与依赖.
+  [enabled] security/ida-reverse 2920B | Use when EXE/ELF/原生so需IDA逆向、交叉引用或反编译.
+  [enabled] security/memory-forensics-local 3527B | Use when 内存镜像需用本地memforensics或Volatility分析.
+  [enabled] security/myos-results-analysis 3668B | Use when MYOS已有取证结果需二次分析、查询或关联.
+  [DISABLED] security/phase-gated-docx-learning 60988B | Use when running SecurityLab 方案A gated docx learning phases.
+  [enabled] security/wire-toutetu 6617B | Use when 离线PCAP需流量、WebShell或隧道分析.
+  [enabled] forensics/linux-loader 7232B | Use when Linux镜像或服务器日志需只读取证和入侵排查.
+  [DISABLED] forensics/utm-forensic-cli 18935B | Use when an agent must perform read-only disk-image forensics on macOS by controlling an isolated UTM Linux VM through u
+  [enabled] forensics/windows-loader 6106B | Use when Windows镜像需只读挂载、工件提取或取证.
+========================================================================
+dfir-myos
+memory_enabled=False
+max_turns=18 budget=900
+context=65536 model=qwen3.8-27b-forensics
+  mcp didctf-ag-1861d72d enabled=True
+    url=https://forensics.didctf.com/api/arena/mcp
+    tools={'resources': False, 'prompts': False}
+  mcp myos-forensics enabled=True
+    command=D:/MYOS/Client/tools/mcp/myos_mcp_server.exe
+    include:
+      - myos-forensics.health_check_dbus
+      - myos-forensics.query_cases
+      - myos-forensics.query_open_cases
+      - myos-forensics.open_case
+      - myos-forensics.query_materials
+      - myos-forensics.load_case
+      - myos-forensics.add_image_material
+      - myos-forensics.add_disk_material
+      - myos-forensics.add_file_collection_material
+      - myos-forensics.query_computer_forensics_results_overview
+      - myos-forensics.query_device_info
+      - myos-forensics.query_device_mount_path
+      - myos-forensics.query_current_node_data
+      - myos-forensics.quick_search_files
+      - myos-forensics.sqlite_query
+      - myos-forensics.create_file_index_task
+      - myos-forensics.quick_search_content
+      - myos-forensics.global_search_content
+      - myos-forensics.query_task_status
+      - myos-forensics.wait_task_completion
+      - myos-forensics.query_phone_forensics_results_overview
+      - myos-forensics.query_encrypt_types
+      - myos-forensics.decrypt_partition
+      - myos-forensics.query_decrypt_task_status
+      - myos-forensics.restart_computer_forensics
+  disabled_count=87
+  [enabled] security/android-malware-analysis 15896B | Use when APK需JADX、Java/Smali逆向或安卓恶意行为分析.
+  [enabled] security/attack-analysis 9320B | Use when analyzing server attack logs and producing a Markdown incident timeline/report from web access logs, applicatio
+  [enabled] security/ctf-misc 3186B | Use when CTF杂题、RSA、编码、隐写或压缩包需本地工具分析.
+  [enabled] security/ctf-misc-analysis 34965B | "Use for CTF-misc files: stego, embedded data, containers, and offline network captures (PCAP/PCAPNG)."
+  [enabled] security/cyber-library 1882B | Use when 本地专用技能不足、需检索818社区安全参考库.
+  [enabled] security/digital-forensics 8894B | "Use when triaging files and preserving evidence."
+  [DISABLED] security/gated-knowledge-promotion 37942B | Use when promoting staged knowledge into an official store.
+  [DISABLED] security/hermes-environment-audit 10015B | Use when 需核查当前Hermes profile的工具、MCP与依赖.
+  [enabled] security/ida-reverse 2920B | Use when EXE/ELF/原生so需IDA逆向、交叉引用或反编译.
+  [enabled] security/memory-forensics-local 3527B | Use when 内存镜像需用本地memforensics或Volatility分析.
+  [enabled] security/myos-results-analysis 9765B | Use when MYOS已有取证结果需二次分析、查询或关联；含手机与计算机（电脑/E01/磁盘镜像）检材.
+  [DISABLED] security/phase-gated-docx-learning 60988B | Use when running SecurityLab 方案A gated docx learning phases.
+  [enabled] security/wire-toutetu 6617B | Use when 离线PCAP需流量、WebShell或隧道分析.
+  [enabled] forensics/android-app-forensics 17004B | Use when Android userdata/手机检材需按 App 定位数据库、MMKV、缓存、聊天记录或图片证据；含 MYOS 解析库入口与手机取证答题校验规则.
+  [enabled] forensics/didctf-arena 3114B | "DIDCTF arena: whoami, list/get, submit answers and notes; no writeup while solving."
+  [enabled] forensics/linux-loader 7812B | Use when Linux镜像/计算机检材需只读取证、挂载或入侵排查（含 openKylin/E01/MYOS 计算机结果）.
+  [enabled] forensics/mobile-ctf-pipeline 13172B | 手机取证（Android）流水线：索引→定位→取数→收口；含微信 key、图片二维码、VeraCrypt 链.
+  [DISABLED] forensics/utm-forensic-cli 18935B | Use when an agent must perform read-only disk-image forensics on macOS by controlling an isolated UTM Linux VM through u
+  [enabled] forensics/windows-loader 6626B | Use when Windows镜像/计算机检材需只读挂载、工件提取或取证（含 E01/MYOS 计算机结果）.
+========================================================================
+dfir-pcap
+memory_enabled=False
+max_turns=22 budget=1200
+context=65536 model=qwen3.8-27b-forensics
+  mcp wiremcp enabled=True
+    command=node
+    tools={}
+  mcp case_fs enabled=True
+    command=C:/Program Files/nodejs/node.exe
+    include:
+      - read_file
+      - read_multiple_files
+      - list_directory
+      - directory_tree
+      - search_files
+      - get_file_info
+  mcp lovelyspark enabled=True
+    url=http://127.0.0.1:8765/mcp
+    tools={}
+  disabled_count=87
+  [enabled] security/android-malware-analysis 15896B | Use when APK需JADX、Java/Smali逆向或安卓恶意行为分析.
+  [enabled] security/attack-analysis 9320B | Use when analyzing server attack logs and producing a Markdown incident timeline/report from web access logs, applicatio
+  [enabled] security/ctf-misc 3186B | Use when CTF杂题、RSA、编码、隐写或压缩包需本地工具分析.
+  [enabled] security/ctf-misc-analysis 34965B | "Use for CTF-misc files: stego, embedded data, containers, and offline network captures (PCAP/PCAPNG)."
+  [enabled] security/cyber-library 1882B | Use when 本地专用技能不足、需检索818社区安全参考库.
+  [enabled] security/digital-forensics 8894B | "Use when triaging files and preserving evidence."
+  [DISABLED] security/gated-knowledge-promotion 37942B | Use when promoting staged knowledge into an official store.
+  [DISABLED] security/hermes-environment-audit 10015B | Use when 需核查当前Hermes profile的工具、MCP与依赖.
+  [enabled] security/ida-reverse 2920B | Use when EXE/ELF/原生so需IDA逆向、交叉引用或反编译.
+  [enabled] security/memory-forensics-local 3527B | Use when 内存镜像需用本地memforensics或Volatility分析.
+  [enabled] security/myos-results-analysis 3668B | Use when MYOS已有取证结果需二次分析、查询或关联.
+  [DISABLED] security/phase-gated-docx-learning 60988B | Use when running SecurityLab 方案A gated docx learning phases.
+  [enabled] security/wire-toutetu 6617B | Use when 离线PCAP需流量、WebShell或隧道分析.
+  [enabled] forensics/linux-loader 7232B | Use when Linux镜像或服务器日志需只读取证和入侵排查.
+  [DISABLED] forensics/utm-forensic-cli 18935B | Use when an agent must perform read-only disk-image forensics on macOS by controlling an isolated UTM Linux VM through u
+  [enabled] forensics/windows-loader 6106B | Use when Windows镜像需只读挂载、工件提取或取证.
+========================================================================
+dfir-re
+memory_enabled=False
+max_turns=26 budget=1500
+context=65536 model=qwen3.8-27b-forensics
+  mcp ida enabled=True
+    url=http://127.0.0.1:8737/mcp
+    include:
+      - open_database
+      - execute_python
+      - reference
+      - list_databases
+      - save_database
+      - close_database
+  mcp jadx enabled=True
+    command=C:\Users\TWK\.local\bin\uv.exe
+    tools={}
+  mcp case_fs enabled=True
+    command=C:/Program Files/nodejs/node.exe
+    include:
+      - read_file
+      - read_multiple_files
+      - list_directory
+      - directory_tree
+      - search_files
+      - get_file_info
+  disabled_count=87
+  [enabled] security/android-malware-analysis 15896B | Use when APK需JADX、Java/Smali逆向或安卓恶意行为分析.
+  [enabled] security/attack-analysis 9320B | Use when analyzing server attack logs and producing a Markdown incident timeline/report from web access logs, applicatio
+  [enabled] security/ctf-misc 3186B | Use when CTF杂题、RSA、编码、隐写或压缩包需本地工具分析.
+  [enabled] security/ctf-misc-analysis 34965B | "Use for CTF-misc files: stego, embedded data, containers, and offline network captures (PCAP/PCAPNG)."
+  [enabled] security/cyber-library 1882B | Use when 本地专用技能不足、需检索818社区安全参考库.
+  [enabled] security/digital-forensics 8894B | "Use when triaging files and preserving evidence."
+  [DISABLED] security/gated-knowledge-promotion 37942B | Use when promoting staged knowledge into an official store.
+  [DISABLED] security/hermes-environment-audit 10015B | Use when 需核查当前Hermes profile的工具、MCP与依赖.
+  [enabled] security/ida-reverse 2920B | Use when EXE/ELF/原生so需IDA逆向、交叉引用或反编译.
+  [enabled] security/memory-forensics-local 3527B | Use when 内存镜像需用本地memforensics或Volatility分析.
+  [enabled] security/myos-results-analysis 3668B | Use when MYOS已有取证结果需二次分析、查询或关联.
+  [DISABLED] security/phase-gated-docx-learning 60988B | Use when running SecurityLab 方案A gated docx learning phases.
+  [enabled] security/wire-toutetu 6617B | Use when 离线PCAP需流量、WebShell或隧道分析.
+  [enabled] forensics/linux-loader 7232B | Use when Linux镜像或服务器日志需只读取证和入侵排查.
+  [DISABLED] forensics/utm-forensic-cli 18935B | Use when an agent must perform read-only disk-image forensics on macOS by controlling an isolated UTM Linux VM through u
+  [enabled] forensics/windows-loader 6106B | Use when Windows镜像需只读挂载、工件提取或取证.
+========================================================================
+skill hash drift across profiles
+security/myos-results-analysis/SKILL.md: {'9f934739d582': ['dfir', 'dfir-mem', 'dfir-pcap', 'dfir-re'], '69ac91104192': ['dfir-max', 'dfir-myos']}
+security/memory-forensics-local/SKILL.md: {'3a3845f085c6': ['dfir', 'dfir-max', 'dfir-mem', 'dfir-myos', 'dfir-pcap', 'dfir-re']}
+security/ida-reverse/SKILL.md: {'8546f9afe2a1': ['dfir', 'dfir-max', 'dfir-mem', 'dfir-myos', 'dfir-pcap', 'dfir-re']}
+security/wire-toutetu/SKILL.md: {'8925e1f1791b': ['dfir', 'dfir-max', 'dfir-mem', 'dfir-myos', 'dfir-pcap', 'dfir-re']}
+security/digital-forensics/SKILL.md: {'4550879a4cfb': ['dfir', 'dfir-max', 'dfir-mem', 'dfir-myos', 'dfir-pcap', 'dfir-re']}
+security/android-malware-analysis/SKILL.md: {'18fcfaf4ca54': ['dfir', 'dfir-max', 'dfir-mem', 'dfir-myos', 'dfir-pcap', 'dfir-re']}
+forensics/android-app-forensics/SKILL.md: {'MISSING': ['dfir', 'dfir-mem', 'dfir-pcap', 'dfir-re'], '276761f5f87a': ['dfir-max', 'dfir-myos']}
+forensics/linux-loader/SKILL.md: {'55aea4711ef9': ['dfir', 'dfir-mem', 'dfir-pcap', 'dfir-re'], '116385130ed0': ['dfir-max', 'dfir-myos']}
+forensics/windows-loader/SKILL.md: {'7285e637be51': ['dfir', 'dfir-mem', 'dfir-pcap', 'dfir-re'], 'fb0b6c226812': ['dfir-max', 'dfir-myos']}

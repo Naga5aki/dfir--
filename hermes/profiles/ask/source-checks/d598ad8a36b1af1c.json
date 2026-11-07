@@ -1,0 +1,32 @@
+{
+  "identity": {
+    "root": "C:\\Users\\TWK\\AppData\\Local\\hermes\\hermes-agent",
+    "home": "C:\\Users\\TWK\\AppData\\Local\\hermes\\profiles\\ask",
+    "head": "4d04303818b61bf3aa09278af48356315515965b",
+    "origin": "https://github.com/NousResearch/hermes-agent.git",
+    "branch": "main",
+    "channel": "stable",
+    "embedded": null,
+    "branchOverride": false,
+    "channelProtocol": 1,
+    "forwardOnly": true
+  },
+  "ts": 1792687616.7850919,
+  "status": {
+    "supported": true,
+    "hermesRoot": "C:\\Users\\TWK\\AppData\\Local\\hermes\\hermes-agent",
+    "behind": 0,
+    "commits": [],
+    "currentSha": "4d04303818b61bf3aa09278af48356315515965b",
+    "currentBranch": "HEAD",
+    "dirty": false,
+    "channel": "stable",
+    "fetchedAt": 1792687616785,
+    "targetSha": "4d04303818b61bf3aa09278af48356315515965b",
+    "updateAvailable": false,
+    "sourceVersion": "0.22.4",
+    "buildId": null,
+    "aheadOfRelease": false,
+    "rollback": false
+  }
+}

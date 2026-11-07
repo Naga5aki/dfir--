@@ -1,0 +1,53 @@
+---
+name: myos-results-analysis
+description: Use when MYOS已有取证结果需二次分析、查询或关联.
+---
+
+# MYOS Results Analysis Skill
+
+对 MYOS／超级取证大师已经完成的取证结果做二次关联分析。优先查询已有结果；本技能不授予重新取证、解密、覆盖索引或修改原始证据的权限。
+
+## When to Use
+
+用户指定 MYOS 案件、检材、设备、节点、文件内容或时间线，需要查询与关联已有结果。新增采集和维护操作须另有明确指令。
+
+## Prerequisites
+
+- 使用 `dfir-myos` 或 `dfir-max` 已配置的 `myos-forensics` MCP；不能假设其他 profile 有此服务器。
+- 先取得用户指定的案件标识和分析目标；不默认打开最近案件或遍历全部案件。
+- 工具名以当前会话发现的 schema 为准。下表用原始工具短名，不能据此拼接截断或哈希后的调用名。
+
+## How to Run
+
+使用 `skill_view` 加载本技能；查看目标工具 schema，再按案件、检材、节点逐层缩小范围。服务缺失或业务健康失败时报告缺失依赖；不自动重启 MYOS。
+
+## Quick Reference
+
+| 能力层级 | 原始短名示例 | 边界 |
+|---|---|---|
+| 健康与查询候选 | health_check_dbus、query_open_cases、query_materials、query_device_info、query_current_node_data、sqlite_query | 先核对参数与当前实现；schema 注解不能证明绝对只读 |
+| 案件/挂载状态 | open_case、load_case | 会改变业务状态或挂载；仅在用户指定目标且需要时执行 |
+| 后台搜索 | global_search_content | 创建异步任务；不得当普通同步读取无限重试 |
+| 索引写入 | create_file_index_task | overwrite 默认 true；不得为“搜索更方便”自动创建、覆盖或重建 |
+| 解密/重新取证 | decrypt_partition、restart_computer_forensics | 用户须明确授权该操作及目标、结果目录；二次分析请求本身不构成授权 |
+
+## Procedure
+
+1. 确认案件唯一标识、检材范围、时区和问题。缺目标时先询问，不扫描案件根目录。
+2. 查询已有概览与必要节点；先选少量字段、明确时间范围和有界返回。能关联现有结果时不重做采集或全盘搜索。
+3. `query_materials` 的 `includeDetail` 默认保持 false；手机概览在 schema 支持时显式 `includeRawJson=false`。不主动索取 passwords、令牌或密钥；不得原样写入回答、日志或报告。
+4. `sqlite_query` 仅用于目标案件的有界 SELECT；不尝试写语句、ATTACH、PRAGMA 修改或绕过只读限制。按实际 schema 提供参数，不猜数据库路径。个别 `.mfs`（如 Platform.mfs）对 `PRAGMA table_info` 返回 `not authorized`：不要重试 PRAGMA 变体，改走 `SELECT name FROM sqlite_master WHERE type='table'` + `SELECT * FROM <表> LIMIT 1`（看行键取列名）再写条件。
+5. 概览/总览类大 JSON 会截断：先落盘 `notes\overview.raw.json` 再分段读，重点找 sqliteQueryHints；不要整段灌上下文。
+5. 后台任务只提交一次，记录 taskId，以 `query_task_status`／`wait_task_completion` 有界跟踪。超时先确认既有任务状态，不重复提交索引、解密或取证。
+6. 区分原始事实、工具派生结果和分析推断，记录案件/检材/节点标识、时间范围、查询条件与证据定位。中文输出；秘密只给必要的掩码或存在性结论。
+
+## Pitfalls
+
+- 当前精选 22 项包含写入与状态操作；不把它称为只读白名单。
+- 不移动 MYOS 管理的 FSData.mfs、dev 或案件数据库；不在原始证据旁生成报告。
+- 不自动增加工具、安装软件、重启取证、重建索引或联网补数据。
+- 未核实任务写入位置和原件保护方式时，停止该有副作用步骤并说明未知项。
+
+## Verification
+
+结论能回溯到指定案件的具体结果；原件未因本次分析被修改；输出位于用户认可的分析目录。没有结果时报告查询范围和限制，不把“未查到”直接等同“未发生”。

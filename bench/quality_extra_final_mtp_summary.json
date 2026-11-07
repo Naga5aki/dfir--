@@ -1,0 +1,199 @@
+{
+  "generated_at": "2026-10-31T00:00:39",
+  "out_prefix": "quality_extra_final_mtp",
+  "tasks": 10,
+  "passed": 10,
+  "accuracy": 1.0,
+  "records": [
+    {
+      "id": "math_phi1024",
+      "category": "math",
+      "timestamp": "2026-10-30T23:58:10",
+      "prompt_tokens": 79,
+      "completion_tokens": 187,
+      "finish_reason": "stop",
+      "decode_tps": 56.137673721200386,
+      "wall_s": 3.998,
+      "reasoning_chars": 223,
+      "score": 1,
+      "detail": {
+        "expected": "512",
+        "boxed": "512"
+      },
+      "content": "质因数分解：\n\n\\[\n1024 = 2^{10}\n\\]\n\n欧拉函数：\n\n\\[\n\\varphi(1024)=\\varphi(2^{10})=2^{10}-2^{9}=1024-512=512\n\\]\n\n最终整数答案：\n\n\\[\n\\boxed{512}\n\\]"
+    },
+    {
+      "id": "math_zeros100",
+      "category": "math",
+      "timestamp": "2026-10-30T23:58:17",
+      "prompt_tokens": 73,
+      "completion_tokens": 340,
+      "finish_reason": "stop",
+      "decode_tps": 53.45697084418965,
+      "wall_s": 6.839,
+      "reasoning_chars": 259,
+      "score": 1,
+      "detail": {
+        "expected": "24",
+        "boxed": "24"
+      },
+      "content": "100! 十进制末尾零的个数等于其质因数分解中因子 \\(5\\) 的个数（因为因子 \\(2\\) 更多）：\n\n\\[\nZ(100!) = \\left\\lfloor \\frac{100}{5} \\right\\rfloor + \\left\\lfloor \\frac{100}{5^2} \\right\\rfloor + \\left\\lfloor \\frac{100}{5^3} \\right\\rfloor + \\cdots\n\\]\n\n计算：\n\n\\[\n\\left\\lfloor \\frac{100}{5} \\right\\rfloor = 20\n\\]\n\n\\[\n\\left\\lfloor \\frac{100}{25} \\right\\rfloor = 4\n\\]\n\n\\[\n\\left\\lfloor \\frac{100}{125} \\right\\rfloor = 0\n\\]\n\n所以：\n\n\\[\nZ(100!) = 20 + 4 = 24\n\\]\n\n最终答案：\n\n\\[\n\\boxed{24}\n\\]"
+    },
+    {
+      "id": "math_pow7",
+      "category": "math",
+      "timestamp": "2026-10-30T23:59:06",
+      "prompt_tokens": 76,
+      "completion_tokens": 2662,
+      "finish_reason": "stop",
+      "decode_tps": 54.991848352280144,
+      "wall_s": 48.86,
+      "reasoning_chars": 2916,
+      "score": 1,
+      "detail": {
+        "expected": "649",
+        "boxed": "649"
+      },
+      "content": "计算 \\(7^{2026} \\bmod 1000\\)。\n\n先找 \\(7\\) 模 \\(1000\\) 的循环周期。逐步计算：\n\n\\[\n\\begin{aligned}\n7^1 &\\equiv 7 \\pmod{1000}\\\\\n7^2 &\\equiv 49 \\pmod{1000}\\\\\n7^3 &\\equiv 343 \\pmod{1000}\\\\\n7^4 &\\equiv 401 \\pmod{1000}\\\\\n7^5 &\\equiv 807 \\pmod{1000}\\\\\n7^6 &\\equiv 649 \\pmod{1000}\\\\\n7^7 &\\equiv 543 \\pmod{1000}\\\\\n7^8 &\\equiv 801 \\pmod{1000}\\\\\n7^9 &\\equiv 607 \\pmod{1000}\\\\\n7^{10} &\\equiv 249 \\pmod{1000}\\\\\n7^{11} &\\equiv 743 \\pmod{1000}\\\\\n7^{12} &\\equiv 201 \\pmod{1000}\\\\\n7^{13} &\\equiv 407 \\pmod{1000}\\\\\n7^{14} &\\equiv 849 \\pmod{1000}\\\\\n7^{15} &\\equiv 943 \\pmod{1000}\\\\\n7^{16} &\\equiv 601 \\pmod{1000}\\\\\n7^{17} &\\equiv 207 \\pmod{1000}\\\\\n7^{18} &\\equiv 449 \\pmod{1000}\\\\\n7^{19} &\\equiv 143 \\pmod{1000}\\\\\n7^{20} &\\equiv 1 \\pmod{1000}\n\\end{aligned}\n\\]\n\n因此 \\(7^{20} \\equiv 1 \\pmod{1000}\\)，所以指数可模 \\(20\\) 化简：\n\n\\[\n2026 \\equiv 6 \\pmod{20}\n\\]\n\n于是\n\n\\[\n7^{2026} \\equiv 7^6 \\pmod{1000}\n\\]\n\n而\n\n\\[\n7^6 = 117649 \\equiv 649 \\pmod{1000}\n\\]\n\n最终答案为：\n\n\\[\n\\boxed{649}\n\\]"
+    },
+    {
+      "id": "code_palindrome",
+      "category": "code",
+      "timestamp": "2026-10-30T23:59:11",
+      "prompt_tokens": 87,
+      "completion_tokens": 240,
+      "finish_reason": "stop",
+      "decode_tps": 48.02171626399085,
+      "wall_s": 5.306,
+      "reasoning_chars": 744,
+      "score": 1,
+      "detail": {
+        "returncode": 0,
+        "stdout_tail": "PASS\n",
+        "stderr_tail": "",
+        "code_head": "def is_palindrome(s: str) -> bool:\n    cleaned = [ch.lower() for ch in s if ch.isalnum()]\n    return cleaned == cleaned[::-1]\n"
+      },
+      "content": "```python\ndef is_palindrome(s: str) -> bool:\n    cleaned = [ch.lower() for ch in s if ch.isalnum()]\n    return cleaned == cleaned[::-1]\n```"
+    },
+    {
+      "id": "code_count_vowels",
+      "category": "code",
+      "timestamp": "2026-10-30T23:59:15",
+      "prompt_tokens": 88,
+      "completion_tokens": 144,
+      "finish_reason": "stop",
+      "decode_tps": 51.98911064446138,
+      "wall_s": 3.189,
+      "reasoning_chars": 397,
+      "score": 1,
+      "detail": {
+        "returncode": 0,
+        "stdout_tail": "PASS\n",
+        "stderr_tail": "",
+        "code_head": "def count_vowels(s):\n    return sum(1 for ch in s.lower() if ch in \"aeiou\")\n"
+      },
+      "content": "```python\ndef count_vowels(s):\n    return sum(1 for ch in s.lower() if ch in \"aeiou\")\n```"
+    },
+    {
+      "id": "code_binary_search",
+      "category": "code",
+      "timestamp": "2026-10-30T23:59:20",
+      "prompt_tokens": 86,
+      "completion_tokens": 245,
+      "finish_reason": "stop",
+      "decode_tps": 54.80612669604185,
+      "wall_s": 4.854,
+      "reasoning_chars": 590,
+      "score": 1,
+      "detail": {
+        "returncode": 0,
+        "stdout_tail": "PASS\n",
+        "stderr_tail": "",
+        "code_head": "def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n"
+      },
+      "content": "```python\ndef binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n```"
+    },
+    {
+      "id": "evidence_latest2",
+      "category": "chinese_evidence",
+      "timestamp": "2026-10-30T23:59:24",
+      "prompt_tokens": 237,
+      "completion_tokens": 177,
+      "finish_reason": "stop",
+      "decode_tps": 51.809368605700975,
+      "wall_s": 4.02,
+      "reasoning_chars": 370,
+      "score": 1,
+      "detail": {
+        "required": [
+          "2026-10-30T12:30:00+08:00",
+          "bb22"
+        ],
+        "missing": []
+      },
+      "content": "2026-10-30T12:30:00+08:00, bb22"
+    },
+    {
+      "id": "evidence_pid_port",
+      "category": "chinese_evidence",
+      "timestamp": "2026-10-30T23:59:26",
+      "prompt_tokens": 126,
+      "completion_tokens": 122,
+      "finish_reason": "stop",
+      "decode_tps": 55.426380025248775,
+      "wall_s": 2.542,
+      "reasoning_chars": 148,
+      "score": 1,
+      "detail": {
+        "required": [
+          "5151",
+          "443"
+        ],
+        "missing": []
+      },
+      "content": "PID 5151, 端口 443"
+    },
+    {
+      "id": "json_tool",
+      "category": "structured",
+      "timestamp": "2026-10-30T23:59:28",
+      "prompt_tokens": 87,
+      "completion_tokens": 80,
+      "finish_reason": "stop",
+      "decode_tps": 49.20613071016904,
+      "wall_s": 2.025,
+      "reasoning_chars": 214,
+      "score": 1,
+      "detail": {
+        "object": {
+          "tool": "search",
+          "arguments": {
+            "query": "evidence",
+            "limit": 3
+          }
+        }
+      },
+      "content": "{\"tool\":\"search\",\"arguments\":{\"query\":\"evidence\",\"limit\":3}}"
+    },
+    {
+      "id": "longctx_48k",
+      "category": "long_context",
+      "timestamp": "2026-10-31T00:00:39",
+      "prompt_tokens": 47970,
+      "completion_tokens": 203,
+      "finish_reason": "stop",
+      "decode_tps": 40.055784620442694,
+      "wall_s": 70.746,
+      "reasoning_chars": 233,
+      "score": 1,
+      "detail": {
+        "required": [
+          "2026-10-30T23:59:59+08:00",
+          "deadbeefcafebabe"
+        ],
+        "missing": []
+      },
+      "content": "采集时间：2026-10-30T23:59:59+08:00  \nSHA-256 前缀：deadbeefcafebabe"
+    }
+  ]
+}

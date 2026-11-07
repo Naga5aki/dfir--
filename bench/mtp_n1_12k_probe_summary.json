@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-10-30T22:14:40",
+  "config": "64K, ngl64, q8/q8, no MTP, reasoning budget 2048",
+  "max_tokens": 512,
+  "runs_requested": 1,
+  "conditions": {
+    "12k": {
+      "target_tokens": 11781,
+      "n": 1,
+      "prompt_tokens": [
+        11736
+      ],
+      "completion_tokens": [
+        512
+      ],
+      "cache_n": [
+        0
+      ],
+      "prompt_tps": [
+        856.9035975421118
+      ],
+      "decode_tps": [
+        33.472831851358094
+      ],
+      "ttft_est_s": [
+        13.725697974559687
+      ],
+      "wall_s": [
+        29.104
+      ],
+      "decode_mean": 33.472831851358094,
+      "decode_min": 33.472831851358094,
+      "decode_max": 33.472831851358094,
+      "decode_stdev": null,
+      "prompt_tps_mean": 856.9035975421118,
+      "ttft_mean": 13.725697974559687
+    }
+  }
+}

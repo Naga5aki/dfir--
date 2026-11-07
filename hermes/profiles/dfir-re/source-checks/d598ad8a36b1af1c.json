@@ -1,0 +1,32 @@
+{
+  "identity": {
+    "root": "C:\\Users\\TWK\\AppData\\Local\\hermes\\hermes-agent",
+    "home": "D:\\ForensicsAgent\\hermes\\profiles\\dfir-re",
+    "head": "4d04303818b61bf3aa09278af48356315515965b",
+    "origin": "https://github.com/NousResearch/hermes-agent.git",
+    "branch": "main",
+    "channel": "stable",
+    "embedded": null,
+    "branchOverride": false,
+    "channelProtocol": 1,
+    "forwardOnly": true
+  },
+  "ts": 1792813414.3042483,
+  "status": {
+    "supported": true,
+    "hermesRoot": "C:\\Users\\TWK\\AppData\\Local\\hermes\\hermes-agent",
+    "behind": -1,
+    "commits": [],
+    "currentSha": "4d04303818b61bf3aa09278af48356315515965b",
+    "currentBranch": "HEAD",
+    "dirty": true,
+    "channel": "stable",
+    "fetchedAt": 1792813414304,
+    "targetSha": "bf0203a794a07aac3ff764972ab9087baa4e4f4e",
+    "updateAvailable": true,
+    "sourceVersion": "0.22.5",
+    "buildId": null,
+    "aheadOfRelease": false,
+    "rollback": false
+  }
+}

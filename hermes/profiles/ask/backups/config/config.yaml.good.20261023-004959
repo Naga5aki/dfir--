@@ -1,0 +1,59 @@
+model:
+  default: qwen3.8-27b-forensics
+  provider: custom
+  base_url: http://127.0.0.1:8095/v1
+  api_key: ${LLAMA_API_KEY}
+  context_length: 65536
+  api_mode: chat_completions
+
+terminal:
+  backend: local
+  cwd: "D:/forensics/cases/CASE-2026-001/work"
+  timeout: 180
+
+agent:
+  max_turns: 8
+  run_budget_seconds: 300
+  save_trajectories: true
+
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+  nudge_interval: 0
+
+platform_toolsets:
+  cli: []
+
+mcp_servers: {}
+_config_version: 51
+known_plugin_toolsets:
+  cli:
+    - a2a
+known_builtin_toolsets:
+  cli:
+    - browser
+    - clarify
+    - code_execution
+    - computer_use
+    - connections
+    - context_engine
+    - cronjob
+    - delegation
+    - discord
+    - discord_admin
+    - file
+    - image_gen
+    - kanban
+    - memory
+    - session_search
+    - skills
+    - stt
+    - terminal
+    - todo
+    - tts
+    - video
+    - video_gen
+    - vision
+    - web
+    - x_search
+    - yuanbao

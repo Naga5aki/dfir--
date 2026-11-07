@@ -1,0 +1,23 @@
+{
+  "runtime_shared": false,
+  "profiles": [
+    "dfir",
+    "dfir-myos",
+    "dfir-re",
+    "dfir-mem",
+    "dfir-pcap",
+    "dfir-max"
+  ],
+  "packages": [
+    "forensics/linux-loader",
+    "forensics/windows-loader",
+    "security/android-malware-analysis",
+    "security/ctf-misc",
+    "security/cyber-library",
+    "security/hermes-environment-audit",
+    "security/ida-reverse",
+    "security/memory-forensics-local",
+    "security/myos-results-analysis",
+    "security/wire-toutetu"
+  ]
+}

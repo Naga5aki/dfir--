@@ -1,0 +1,422 @@
+{
+  "generated_at": "2026-10-30T21:40:00+08:00",
+  "scope": "Controlled single-request baseline on the running 64K production server; no config change.",
+  "server": {
+    "pid": 41580,
+    "started": "2026-10-30T14:47:06+08:00",
+    "model": "D:\\llm\\models\\qwen3.8-27b-mix\\Qwen3.8-27B-IQ3-MIX.gguf",
+    "engine": "llama.cpp b11714 / c0fd78626 / Windows CUDA",
+    "n_ctx": 65536,
+    "n_parallel": 1,
+    "ngl": 64,
+    "b": 512,
+    "ub": 128,
+    "t": 6,
+    "tb": 6,
+    "kv": "q8_0/q8_0",
+    "flash_attn": "on",
+    "reasoning_budget": 2048,
+    "speculative": "none",
+    "backend_sampling": false
+  },
+  "conditions": {
+    "short": {
+      "target_tokens": 120,
+      "n": 3,
+      "prompt_tokens": [
+        186,
+        186,
+        186
+      ],
+      "completion_tokens": [
+        512,
+        512,
+        512
+      ],
+      "cache_n": [
+        0,
+        0,
+        0
+      ],
+      "prompt_tps": [
+        435.20377363788236,
+        324.4170957344384,
+        435.44626218547194
+      ],
+      "decode_tps": [
+        27.519371537257943,
+        27.285914898595447,
+        28.13223383094355
+      ],
+      "ttft_est_s": [
+        0.4637240391389433,
+        0.6099849452054794,
+        0.4626944129158513
+      ],
+      "wall_s": [
+        19.002,
+        19.321,
+        18.606
+      ],
+      "decode_mean": 27.645840088932314,
+      "decode_min": 27.285914898595447,
+      "decode_max": 28.13223383094355,
+      "decode_stdev": 0.43710371164595335,
+      "prompt_tps_mean": 398.3557105192642,
+      "ttft_mean": 0.5121344657534247
+    },
+    "12k": {
+      "target_tokens": 11781,
+      "n": 3,
+      "prompt_tokens": [
+        11736,
+        11765,
+        11835
+      ],
+      "completion_tokens": [
+        512,
+        512,
+        512
+      ],
+      "cache_n": [
+        0,
+        0,
+        0
+      ],
+      "prompt_tps": [
+        823.3874014571346,
+        949.2615850255982,
+        967.4312057094708
+      ],
+      "decode_tps": [
+        25.054294519360816,
+        26.782881660911844,
+        26.17000135305565
+      ],
+      "ttft_est_s": [
+        14.293228317025441,
+        12.431181281800392,
+        12.271639690802349
+      ],
+      "wall_s": [
+        34.66,
+        31.498,
+        31.787
+      ],
+      "decode_mean": 26.002392511109438,
+      "decode_min": 25.054294519360816,
+      "decode_max": 26.782881660911844,
+      "decode_stdev": 0.8763976947754948,
+      "prompt_tps_mean": 913.3600640640678,
+      "ttft_mean": 12.998683096542727
+    },
+    "32k": {
+      "target_tokens": 32000,
+      "n": 3,
+      "prompt_tokens": [
+        31739,
+        32090,
+        32062
+      ],
+      "completion_tokens": [
+        512,
+        512,
+        512
+      ],
+      "cache_n": [
+        0,
+        0,
+        0
+      ],
+      "prompt_tps": [
+        926.9833885709978,
+        928.6809763796982,
+        916.9986909130097
+      ],
+      "decode_tps": [
+        24.971647894682395,
+        24.931644116051483,
+        25.47631993511565
+      ],
+      "ttft_est_s": [
+        34.2790624148728,
+        34.59449466927593,
+        35.0033151369863
+      ],
+      "wall_s": [
+        54.737,
+        55.084,
+        55.057
+      ],
+      "decode_mean": 25.126537315283176,
+      "decode_min": 24.931644116051483,
+      "decode_max": 25.47631993511565,
+      "decode_stdev": 0.30358028003946463,
+      "prompt_tps_mean": 924.2210186212352,
+      "ttft_mean": 34.62562407371168
+    },
+    "56k": {
+      "target_tokens": 55900,
+      "n": 3,
+      "prompt_tokens": [
+        55597,
+        55949,
+        55472
+      ],
+      "completion_tokens": [
+        512,
+        512,
+        512
+      ],
+      "cache_n": [
+        0,
+        0,
+        0
+      ],
+      "prompt_tps": [
+        867.4406193935115,
+        857.4457019126162,
+        852.5698320888368
+      ],
+      "decode_tps": [
+        22.561446496898327,
+        22.346848541150937,
+        22.796128512527634
+      ],
+      "ttft_est_s": [
+        64.13747139921722,
+        65.29552803913894,
+        65.10833209784735
+      ],
+      "wall_s": [
+        86.774,
+        88.167,
+        87.514
+      ],
+      "decode_mean": 22.568141183525633,
+      "decode_min": 22.346848541150937,
+      "decode_max": 22.796128512527634,
+      "decode_stdev": 0.224714790994807,
+      "prompt_tps_mean": 859.1520511316548,
+      "ttft_mean": 64.84711051206784
+    },
+    "12k_mistarget_9.7k": {
+      "target_tokens": 11781,
+      "n": 3,
+      "prompt_tokens": [
+        9684,
+        9688,
+        9672
+      ],
+      "completion_tokens": [
+        512,
+        512,
+        512
+      ],
+      "cache_n": [
+        0,
+        0,
+        0
+      ],
+      "prompt_tps": [
+        935.6849002834688,
+        978.139076272434,
+        939.1547723569231
+      ],
+      "decode_tps": [
+        24.484444328171282,
+        26.984733769725587,
+        24.26991258461935
+      ],
+      "ttft_est_s": [
+        10.390480258317027,
+        9.941579990215265,
+        10.339825279843444
+      ],
+      "wall_s": [
+        31.23,
+        28.869,
+        31.378
+      ],
+      "decode_mean": 25.24636356083874,
+      "decode_min": 24.26991258461935,
+      "decode_max": 26.984733769725587,
+      "decode_stdev": 1.5092893044763922,
+      "prompt_tps_mean": 950.9929163042752,
+      "ttft_mean": 10.223961842791912
+    }
+  },
+  "gpu_telemetry": {
+    "short12k_phase": {
+      "n_samples": 188,
+      "power_median_w": 131.05,
+      "power_max_w": 192.27,
+      "sm_median_mhz": 1949.5,
+      "sm_max_mhz": 2512.0,
+      "mem_median_mhz": 14301.0,
+      "temp_median_c": 71.0,
+      "temp_max_c": 77.0,
+      "mem_used_min_mib": 15210.0,
+      "mem_used_max_mib": 15711.0,
+      "util_median_pct": 68.0
+    },
+    "12k_phase": {
+      "n_samples": 108,
+      "power_median_w": 136.32,
+      "power_max_w": 209.56,
+      "sm_median_mhz": 2096.0,
+      "sm_max_mhz": 2617.0,
+      "mem_median_mhz": 14301.0,
+      "temp_median_c": 71.0,
+      "temp_max_c": 76.0,
+      "mem_used_min_mib": 15403.0,
+      "mem_used_max_mib": 15678.0,
+      "util_median_pct": 72.5
+    },
+    "32k56k_phase": {
+      "n_samples": 444,
+      "power_median_w": 161.325,
+      "power_max_w": 171.58,
+      "sm_median_mhz": 2227.0,
+      "sm_max_mhz": 2505.0,
+      "mem_median_mhz": 14301.0,
+      "temp_median_c": 75.0,
+      "temp_max_c": 79.0,
+      "mem_used_min_mib": 15486.0,
+      "mem_used_max_mib": 15694.0,
+      "util_median_pct": 85.0
+    }
+  },
+  "gpu_process_memory": {
+    "dedicated_bytes": 14484697088,
+    "shared_bytes": 111149056,
+    "constant_across_all_runs": true
+  },
+  "memory_math": {
+    "main_kv_bytes": 2281701376,
+    "main_kv_gib": 2.125,
+    "gpu_weights_ngl64_bytes": 11449528064,
+    "gpu_weights_ngl64_gib": 10.665,
+    "cpu_weights_ngl64_bytes": 886941952,
+    "full_offload_delta_bytes": 340637952,
+    "full_offload_delta_mib": 324.9,
+    "mtp_weights_bytes": 238983168,
+    "mtp_weights_mib": 227.91,
+    "mtp_kv_bytes_at_64k": 142606336,
+    "mtp_kv_mib": 136.0,
+    "mtp_kv_note": "142606336 B assumes explicit --spec-draft-type-k/v q8_0; draft default is F16 = 268435456 B (256 MiB) at 64K."
+  },
+  "prefix_reuse": {
+    "raw_content_tokens": 11818,
+    "run1": {
+      "cache_prompt": true,
+      "prompt_tokens": 11870,
+      "cache_n": 42,
+      "prompt_ms": 12187.111,
+      "prompt_tps": 970.533541542372,
+      "decode_tps": 27.10539559577873,
+      "wall_s": 16.912,
+      "finish": "length"
+    },
+    "run2": {
+      "cache_prompt": true,
+      "prompt_tokens": 11870,
+      "cache_n": 11866,
+      "prompt_ms": 119.536,
+      "prompt_tps": 33.4627225271048,
+      "decode_tps": 27.135250420970294,
+      "wall_s": 4.826,
+      "finish": "length"
+    }
+  },
+  "quality_probe": {
+    "generated_at": "2026-10-30T21:25:59",
+    "records": [
+      {
+        "label": "math_budget_2048",
+        "timestamp": "2026-10-30T21:21:56",
+        "budget_requested": 2048,
+        "max_tokens": 4608,
+        "prompt_tokens": 91,
+        "completion_tokens": 3183,
+        "cache_n": 0,
+        "prompt_tps": 263.9953815313473,
+        "decode_tps": 27.45868466808098,
+        "ttft_est_s": 0.38112135040854805,
+        "wall_s": 116.26,
+        "finish_reason": "stop",
+        "reasoning_chars": 3752,
+        "content_chars": 1855,
+        "reasoning_tokens": 2048,
+        "reasoning_tail": "equal values. Sum fracs beyond 4: 0.1825+0.01825+...=0.202777... total sum fracs=1.7777. OK.\n\nIf only finite terms up to 10000, f(n)=floor(n/10)+...+floor(n/10000) for n<100000. Bound f(n) > n/9 - (sum of tail?) Actually f(n) = n/9 - sum_{k>=1} {n/10^k}. Sum fracs < number of terms? Infinite sum of\n",
+        "content": "设 \\(Z(n)\\) 为 \\(n!\\) 末尾零的个数，则\n\n\\[\nZ(n)=v_{10}(n!)=v_5(n!)=\\sum_{k\\ge 1}\\left\\lfloor \\frac{n}{10^k}\\right\\rfloor .\n\\]\n\n要求最小的正整数 \\(n\\)，使得\n\n\\[\nZ(n)=2026.\n\\]\n\n---\n\n## 1. 用不等式缩小范围\n\n因为\n\n\\[\nZ(n)=\\sum_{k\\ge 1}\\left\\lfloor \\frac{n}{10^k}\\right\\rfloor\n< \\sum_{k\\ge 1}\\frac{n}{10^k}\n= \\frac{n}{9},\n\\]\n\n所以若 \\(Z(n)=2026\\)，则\n\n\\[\n2026<\\frac{n}{9}\n\\quad\\Longrightarrow\\quad\nn>9\\cdot 2026=18234.\n\\]\n\n另一方面，对 \\(n<100000\\)，只有前四项可能非零：\n\n\\[\nZ(n)=\\left\\lfloor \\frac n{10}\\right\\rfloor+\n\\left\\lfloor \\frac n{100}\\right\\rfloor+\n\\left\\lfloor \\frac n{1000}\\right\\rfloor+\n\\left\\lfloor \\frac n{10000}\\right\\rfloor.\n\\]\n\n于是\n\n\\[\nZ(n)\n> \\frac n{10}+\\frac n{100}+\\frac n{1000}+\\frac n{10000}-4\n= \\frac{1111n}{10000}-4.\n\\]\n\n若 \\(Z(n)=2026\\)，则\n\n\\[\n2026>\\frac{1111n}{10000}-4,\n\\]\n\n即\n\n\\[\n2030>\\frac{1111n}{10000}\n\\quad\\Longrightarrow\\quad\nn<\\frac{2030\\cdot 10000}{1111}\\approx 18271.8.\n\\]\n\n因此只需检查\n\n\\[\n18235\\le n\\le 18271.\n\\]\n\n---\n\n## 2. 在小区间内精确计算\n\n在这个范围内，\n\n\\[\n\\left\\lfloor \\frac n{10000}\\right\\rfloor=1,\n\\]\n\n所以\n\n\\[\nZ(n)=\\left\\lfloor \\frac n{10}\\right\\rfloor+\n\\left\\lfloor \\frac n{100}\\right\\rfloor+\n\\left\\lfloor \\frac n{1000}\\right\\rfloor+1.\n\\]\n\n我们寻找最小的 \\(n\\) 使 \\(Z(n)=2026\\)。\n\n先看 \\(n=18249\\)：\n\n\\[\n\\left\\lfloor \\frac{18249}{10}\\right\\rfloor=1824,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18249}{100}\\right\\rfloor=182,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18249}{1000}\\right\\rfloor=18,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18249}{10000}\\right\\rfloor=1.\n\\]\n\n因此\n\n\\[\nZ(18249)=1824+182+18+1=2025.\n\\]\n\n再看 \\(n=18250\\)：\n\n\\[\n\\left\\lfloor \\frac{18250}{10}\\right\\rfloor=1825,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18250}{100}\\right\\rfloor=182,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18250}{1000}\\right\\rfloor=18,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18250}{10000}\\right\\rfloor=1.\n\\]\n\n因此\n\n\\[\nZ(18250)=1825+182+18+1=2026.\n\\]\n\n由于 \\(Z(n)\\) 是单调不减函数，且 \\(Z(18249)=2025\\)，所以不存在小于 \\(18250\\) 的正整数使末尾零数达到 \\(2026\\)。\n\n---\n\n## 3. 最终答案\n\n\\[\n\\boxed{18250}\n\\]\n\n即最小的正整数 \\(n\\) 为\n\n\\[\n\\boxed{18250}.\n\\]"
+      },
+      {
+        "label": "math_budget_4096",
+        "timestamp": "2026-10-30T21:24:45",
+        "budget_requested": 4096,
+        "max_tokens": 4608,
+        "prompt_tokens": 91,
+        "completion_tokens": 4608,
+        "cache_n": 0,
+        "prompt_tps": 293.0417085297679,
+        "decode_tps": 27.701472623994125,
+        "ttft_est_s": 0.3466351638810506,
+        "wall_s": 166.643,
+        "finish_reason": "length",
+        "reasoning_chars": 8229,
+        "content_chars": 863,
+        "reasoning_tokens": 4096,
+        "reasoning_tail": "actly 2026 trailing zeros, not at least. Yes.\n\nNeed final integer answer: 18250.\n\nNeed provide full derivation, key inequalities. Could include general formula, monotonicity, lower bound, upper bound.\n\nLet's think if there is any possibility of n smaller with Z=2026 due to jumps? No because max for\n",
+        "content": "设 \\(Z(n)\\) 表示 \\(n!\\) 末尾零的个数。末尾零的个数等于 \\(n!\\) 中因子 \\(10=2\\cdot 5\\) 的个数，而 \\(2\\) 的因子总是多于 \\(5\\) 的因子，因此\n\n\\[\nZ(n)=v_5(n!)=\\left\\lfloor \\frac n{10}\\right\\rfloor+\\left\\lfloor \\frac n{100}\\right\\rfloor+\\left\\lfloor \\frac n{1000}\\right\\rfloor+\\left\\lfloor \\frac n{10000}\\right\\rfloor+\\cdots\n\\]\n\n要求最小的正整数 \\(n\\)，使得\n\n\\[\nZ(n)=2026.\n\\]\n\n---\n\n## 1. 先给出一个下界\n\n因为对每个 \\(k\\ge 1\\)，有\n\n\\[\n\\left\\lfloor \\frac n{10^k}\\right\\rfloor < \\frac n{10^k},\n\\]\n\n所以\n\n\\[\nZ(n)<\\sum_{k=1}^{\\infty}\\frac n{10^k}\n=\\frac n{9}.\n\\]\n\n若 \\(Z(n)=2026\\)，则\n\n\\[\n2026<\\frac n{9},\n\\]\n\n即\n\n\\[\nn>9\\cdot 2026=18234.\n\\]\n\n因此\n\n\\[\nn\\ge 18235.\n\\]\n\n---\n\n## 2. 检查 \\(n<18250\\) 是否可能\n\n若 \\(n<18250\\)，则 \\(n\\le 18249\\)。此时\n\n\\[\n\\left\\lfloor \\frac n{10}\\right\\rfloor\\le 1824,\n\\]\n\n\\[\n\\left\\lfloor \\frac n{100}\\right\\rfloor\\le 182,\n\\]\n\n\\[\n\\left\\lfloor \\frac n{1000}\\right\\rfloor\\le 18,\n\\]\n\n\\[\n\\left\\lfloor \\frac n{10000}\\right\\rfloor\\le 1,\n\\"
+      },
+      {
+        "label": "longfact_55k",
+        "timestamp": "2026-10-30T21:25:59",
+        "budget_requested": 2048,
+        "max_tokens": 128,
+        "prompt_tokens": 55483,
+        "completion_tokens": 128,
+        "cache_n": 0,
+        "prompt_tps": 833.1441291441724,
+        "decode_tps": 22.69209753956912,
+        "ttft_est_s": 66.6387882047244,
+        "wall_s": 72.222,
+        "finish_reason": "length",
+        "reasoning_chars": 155,
+        "content_chars": 30,
+        "reasoning_tokens": 98,
+        "reasoning_tail": "用户要求只回答样本 Z9Q7 的采集时间和 SHA-256 前缀。需要从给定文本中提取最后一条：样本编号 Z9Q7，采集时间 2026-10-30T23:59:59+08:00，证据文件 evidence_Z9Q7.bin，SHA-256 前缀 deadbeefcafebabe。必须只回答这两个字段。中文。\n",
+        "content": "采集时间：2026-10-30T23:59:59+08:00",
+        "raw_prompt_tokens": 55431
+      }
+    ]
+  },
+  "quality_probe_longfact_256": {
+    "label": "longfact_55k_256",
+    "timestamp": "2026-10-30T21:27:30",
+    "budget_requested": 2048,
+    "max_tokens": 256,
+    "prompt_tokens": 55483,
+    "completion_tokens": 150,
+    "cache_n": 0,
+    "prompt_tps": 832.4115114366901,
+    "decode_tps": 23.24919517215639,
+    "ttft_est_s": 66.69634324161073,
+    "wall_s": 73.113,
+    "finish_reason": "stop",
+    "reasoning_chars": 162,
+    "content_chars": 58,
+    "reasoning_tokens": 103,
+    "reasoning_tail": "用户要求只回答样本 Z9Q7 的采集时间和 SHA-256 前缀。需要从给定文本中提取。文本最后：样本编号 Z9Q7，采集时间 2026-10-30T23:59:59+08:00，证据文件 evidence_Z9Q7.bin，SHA-256 前缀 deadbeefcafebabe。\n需要只回答这两个字段。中文。不要多余。\n",
+    "content": "采集时间：2026-10-30T23:59:59+08:00；SHA-256 前缀：deadbeefcafebabe"
+  },
+  "notes": [
+    "12k_mistarget_9.7k is an earlier builder oscillation and is excluded from the 12K baseline conclusion; raw data retained.",
+    "short prompt was 186 tokens, not 134; prior 28.13 t/s single run is within the 27.29-28.13 range.",
+    "All baseline runs used cache_prompt=false and timings.cache_n=0.",
+    "TTFT is estimated as prompt_ms + one decode step, not a streaming first-chunk measurement.",
+    "Dedicated GPU memory is a Windows performance counter; nvidia-smi per-process memory is N/A on WDDM.",
+    "Power max values include 1 s transients; long-context median is the more useful number."
+  ]
+}

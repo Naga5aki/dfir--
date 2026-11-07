@@ -1,0 +1,106 @@
+---
+name: android-app-forensics
+description: Use when Android userdata/手机检材需按 App 定位数据库、MMKV、缓存、聊天记录或图片证据；含 MYOS 解析库入口与手机取证答题校验规则.
+---
+
+# Android App Forensics
+
+AI 主导的 Android 手机检材分析。目标：**先走 MYOS 解析结果，再回落文件系统**，把"猜 App / 猜包名 / 猜表"的轮次压到 0。
+
+## 铁律（违反即浪费 2–6 轮）
+
+1. **先解析库，后文件系统。** `data\MApps.mfs`、`data\apklist.mfs`、`data\MApps\<App>{GUID}.mfs` 是 MYOS 已解析好的结果，优先查它们。
+2. **一切名字必须来自枚举。** 包名、App 名、表名、库文件名都要来自 `apklist.mfs` / `MApps.mfs` / 目录枚举，**禁止凭记忆写**（本次把 DeepSeek 猜成 `com.bytedance.dreamina`）。
+3. **`.mfs` 只能走 MCP `sqlite_query`。** 用 `python sqlite3` 打开必报 `file is not a database`（已实测），不要重试。
+4. **图片不要 `read_file`。** 返回 `is_image: false, content: ""`，直接调 `ocr.ps1`。
+5. **大返回先落盘。** 超过 2000 字符的 JSON（如结果总览）先 `write` 到 `notes\`，再分段读；一次性灌上下文会被截断在关键字段之前。
+6. **子库缺失立刻回落原始明文库。** MYOS 只解析了部分 App（本案 17 个子库覆盖 DeepSeek/JianYing/HuanYou/SouGouInput/JiaoGuan12123/MiCloud/XiaoMiMarket，**不含即梦、抖音**）。若 `MApps` 下找不到目标 App 的子库，直接走 `<root>\data\data\<pkg>\databases\*.db`，用 `python sqlite3` 只读打开（`file:...?mode=ro`，明文可直接查）。**不要为了找子库把 17 个库全枚举一遍**——那会烧光预算还得不到答案（本次 Q9 就是这么失败的）。
+7. **题面【答案格式】里的示例值不是答案。** `【答案格式：seedance1.5pro】` 只是格式示范；照抄会得到一个格式完全正确、内容完全错误的答案（本次 Q9 输出 `seedance1.5pro`，实际是 `seedance1.0fast`）。任何结论必须有库里读出的原始字段支撑，没有就写"未取到"。 
+
+## 原始文件系统的 root 在哪（不要 ls 到处找）
+
+`<root>` 只有一个权威来源：`D:\ForensicsAgent\hermes\state\myos_mount.json` 的 `rootPath`
+（形如 `C:\osmap\<GUID>_<时间戳>\Root\userdata`）。
+
+- 文件不存在 → 先跑 `python D:\ForensicsAgent\hermes\bin\myos_mount.py mount`，再读它。
+- **不要**去 `D:\MYOS\Case\...\dev\userdata.tar\` 下面找 `data\data`、`files\`、`attachments\`：检材目录只有 MYOS 的 `.mfs` 与索引库，原始文件系统只在 `C:\osmap` 挂载点。
+- 拿到 root 后：App 私有数据 = `<rootPath>\data\data\<pkg>\`。
+
+## 开局 6 步（不可换序）
+
+```text
+1. 读 D:\ForensicsAgent\hermes\state\myos_mount.json 的 rootPath；不存在 → python D:\ForensicsAgent\hermes\bin\myos_mount.py mount
+2. query_open_cases → query_materials 取 caseId / caseMaterialId
+3. query_phone_forensics_results_overview(caseMaterialId)  ← 用 tool_search 返回的精确名
+   └ 若被截断：落盘 notes/overview.raw.json，分 3 段读，重点找 sqliteQueryHints
+4. sqlite_query(MApps.mfs): PRAGMA table_info(TBL_APPDATA_MANAGER) → SELECT *
+   └ 得到 App 名 / 包名 / 子库映射，写入 notes/datasources.md
+5. sqlite_query(apklist.mfs): 包名 ↔ App 中文名
+   └ 0 字节空文件（sqlite_master 返回 0 行）→ 改用 ls data/data（过滤 com.android* / android.* / com.miui* / com.xiaomi* 前缀）拿第三方包名清单，App 中文名走 Platform.mfs 或 MYOS 桌面应用清单
+6. 设备级信息（Android ID / 型号 / 系统版本）走 MYOS 桌面「设备信息」面板或 query_current_node_data
+```
+
+## 目录入口
+
+| 目标 | 路径 |
+|---|---|
+| App 私有数据 | `<root>\data\data\<pkg>\` |
+| 数据库 | `...\databases\*.db`（含 `-wal` / `-journal`，先读 wal） |
+| 键值 | `...\shared_prefs\*.xml`、`...\files\mmkv\*.mmkv` |
+| 媒体 | `<root>\data\media\0\`（DCIM / Movies / Download / Pictures） |
+| 无线网络 | `data\misc\apexdata\com.android.wifi\WifiConfigStore.xml` |
+| 设备账户 | `data\system\users\0\settings_ssaid.xml`（每 App key，不是设备 Android ID） |
+| 输入法 | `...\com.sohu.inputmethod.sogou\databases\` |
+| MYOS 解析子库 | `<MYOS案件>\dev\<检材>\data\MApps\<App>{GUID}.mfs` |
+
+## 存储形态判定树
+
+```text
+MApps 下有该 App 子库？          → sqlite_query 查 <App>{GUID}.mfs
+MApps 下无该 App 子库？          → 立刻回落 <root>\data\data\<pkg>\databases\*.db（明文，python sqlite3 只读可开）
+有 databases/*.db 明文？        → sqlite3 直查
+有 files/mmkv/*.mmkv？         → MMKV（不是 XML），strings / hexdump 找 key（简记事邮箱即此类）
+只有 shared_prefs/*.xml？      → SharedPreferences
+只有 -wal 没有主库内容？        → 先解析 wal
+文本全局搜零命中？              → 三选一：图片(OCR) / 加密库(decrypt_partition) / App 子库
+```
+
+## 题型 → 直查路径
+
+| 题面关键词 | 直接查 | 备注 |
+|---|---|---|
+| 最后连接某 SSID 的时间 | `WifiConfigStore.xml` 的 `LastConnectedTime` | 毫秒时间戳，必须脚本换算成 `Asia/Shanghai` |
+| 某 App 的登录邮箱/账号 | App 的 `mmkv` 或 `shared_prefs` | 简记事在 `files/mmkv/mmkv.default` |
+| 某个文件名 / 提示词文件的 MD5 | `data\media\0\` 或全局文件名搜索 | **在原始路径算哈希**，不要对副本算 |
+| AI 生成内容的条数 | `com.bytedance.dreamina\databases\dreamina.db` 的 `aigc_data` + `data\media\0\` 文件枚举 | 即梦未被子库解析，走原始库；本案例 3 条 |
+| 某个 `history_record_id` 的模型名 | 同上库同表，`data_json` 里的 `model_info.model_name` | 本案例 `Seedance 1.0 Fast` → `seedance1.0fast` |
+| App 中文名 / 引流软件 | `apklist.mfs`（包名↔App 名） | 一条 SQL，不要靠猜；**先确认非 0 字节**，空文件时走 ls data/data + Platform.mfs |
+| 剪辑工程数（剪映） | `files\draft` 或 `files\drafts` 目录，数工程子目录 | 剪映子库只有 BROWSE_MULTIMEDIA / BROWSE_SEARCH / BROWSE_ACCOUNT 三表，**无工程表**；工程是文件系统目录；目录只剩占位 PNG 时工程在别处，用 quick_search_files 搜 draft_info.json |
+| Android ID / 设备信息 | 设备信息面板 / `query_current_node_data` | 不要逐条读 ssaid.xml |
+| 中签截图 / 余额 / 认购金额 | 图库 `DCIM_*.jpg` → `ocr.ps1` | 取数字，不逐字抄；中文会插空格 |
+
+## 反模式（本次踩过，别重复）
+
+- ✗ 开局就 `ls data/data | grep -v com.android` 看包名 → 烧 token 且不知道 App 名（apklist.mfs 为空时例外：那是唯一包名清单，见开局第 5 步）
+- ✗ `cat` 3000 字符 XML 全文 → 用 `grep` 只取命中行
+- ✗ 同一个关键字换 3 种拼法继续全局搜 → 2 次零命中就换分支
+- ✗ Windows 下 python sqlite3 用单斜线 URI `file:C:/...?mode=ro` 打开原生 .db → 直接报 `unable to open database file`；URI 要 `file:///C:/...` 三斜线，或把 .db 拷到临时目录再开（不要对证据路径拿可写句柄）
+- ✗ 只查一个 App 就回答数量类题 → 至少两个来源
+- ✗ 结论写"待确认"就交付 → 时间戳/哈希必须当场算清写死
+- ✗ 把 `MApps` 下 17 个子库挨个 `sqlite_master` 枚举找目标 App → 目标不在就永远找不到，烧光预算（Q9 实测 36 次调用后仍空手）
+- ✗ 照抄题面【答案格式】里的示例值 → 格式对、内容错（Q9 写成 `seedance1.5pro`，实际 `seedance1.0fast`）
+
+## 收口校验（提交前逐条过）
+
+1. 时间类：原始值 + 换算结果 + 时区，三者齐全。
+2. 哈希类：原始路径 + 算法 + 截取规则，可复现。
+3. 数量类：两个来源，数量一致或解释差异。
+4. 名称类：来自枚举，有包名/表名支撑。
+5. 答案格式：严格符合题面【答案格式】，大小写/位数/连接符不漏；**但绝不用格式里的示例值当答案**。
+
+## 相关文件
+
+- 工具真名与易错点：`D:\forensics\cases\notes\tool-map.md`
+- 本案数据源地图：`D:\forensics\cases\notes\datasources.md`
+- 已排除路径：`D:\forensics\cases\notes\rejects.md`
+- OCR：`D:\ForensicsAgent\hermes\bin\ocr.ps1 -Path <文件|目录> [-Out <txt>]`

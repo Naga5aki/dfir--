@@ -1,0 +1,26 @@
+{
+  "usage": {
+    "completion_tokens": 3315,
+    "prompt_tokens": 91,
+    "total_tokens": 3406,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "timings": {
+    "cache_n": 0,
+    "prompt_n": 91,
+    "prompt_ms": 592.74,
+    "prompt_per_token_ms": 6.513626373626374,
+    "prompt_per_second": 153.5243108276816,
+    "predicted_n": 3315,
+    "predicted_ms": 60647.215,
+    "predicted_per_token_ms": 18.300306276403138,
+    "predicted_per_second": 54.64389420025305,
+    "draft_n": 2967,
+    "draft_n_accepted": 2325
+  },
+  "finish": "stop",
+  "content": "设 \\(Z(n)\\) 为 \\(n!\\) 末尾零的个数。因为 \\(n!\\) 中因子 \\(2\\) 的个数总是多于因子 \\(5\\) 的个数，所以\n\n\\[\nZ(n)=v_5(n!)=\\sum_{k\\ge 1}\\left\\lfloor \\frac{n}{5^k}\\right\\rfloor .\n\\]\n\n题目要求最小的正整数 \\(n\\)，使得\n\n\\[\nZ(n)=2026.\n\\]\n\n---\n\n## 1. 用不等式缩小范围\n\n对任意 \\(n\\)，有\n\n\\[\n\\sum_{k\\ge 1}\\left(\\frac{n}{5^k}-1\\right)\n<\n\\sum_{k\\ge 1}\\left\\lfloor \\frac{n}{5^k}\\right\\rfloor\n<\n\\sum_{k\\ge 1}\\frac{n}{5^k}.\n\\]\n\n由于\n\n\\[\n\\sum_{k\\ge 1}\\frac{n}{5^k}=\\frac{n}{4},\n\\]\n\n因此\n\n\\[\nZ(n)<\\frac{n}{4}.\n\\]\n\n若 \\(Z(n)=2026\\)，则\n\n\\[\n2026<\\frac{n}{4}\\quad\\Longrightarrow\\quad n>8104.\n\\]\n\n另一方面，若 \\(n<15625\\)，则只有 \\(5,25,125,625,3125\\) 五项可能非零。于是\n\n\\[\nZ(n)>\\frac{n}{4}-5.\n\\]\n\n若 \\(Z(n)=2026\\)，则\n\n\\[\n2026>\\frac{n}{4}-5\n\\quad\\Longrightarrow\\quad\n\\frac{n}{4}<2031\n\\quad\\Longrightarrow\\quad\nn<8124.\n\\]\n\n因此只需检查\n\n\\[\n8105\\le n\\le 8123.\n\\]\n\n---\n\n## 2. 在小区间内精确计算\n\n对 \\(8105\\le n\\le 8123\\)，有\n\n\\[\n\\left\\lfloor \\frac{n}{3125}\\right\\rfloor=2,\n\\qquad\n\\left\\lfloor \\frac{n}{625}\\right\\rfloor=12,\n\\qquad\n\\left\\lfloor \\frac{n}{125}\\right\\rfloor=64,\n\\]\n\n而 \\(\\left\\lfloor n/25\\right\\rfloor\\) 和 \\(\\left\\lfloor n/5\\right\\rfloor\\) 会随 \\(n\\) 变化。\n\n计算候选值：\n\n\\[\nZ(8104)=\\left\\lfloor\\frac{8104}{5}\\right\\rfloor\n+\\left\\lfloor\\frac{8104}{25}\\right\\rfloor\n+\\left\\lfloor\\frac{8104}{125}\\right\\rfloor\n+\\left\\lfloor\\frac{8104}{625}\\right\\rfloor\n+\\left\\lfloor\\frac{8104}{3125}\\right\\rfloor\n\\]\n\n\\[\n=1620+324+64+12+2=2022.\n\\]\n\n继续增加 \\(n\\)：\n\n\\[\nZ(8105)=1621+324+64+12+2=2023,\n\\]\n\n\\[\nZ(8110)=1622+324+64+12+2=2024,\n\\]\n\n\\[\nZ(8115)=1623+324+64+12+2=2025,\n\\]\n\n\\[\nZ(8120)=1624+324+64+12+2=2026.\n\\]\n\n并且\n\n\\[\nZ(8119)=1623+324+64+12+2=2025.\n\\]\n\n由于 \\(Z(n)\\) 是单调不减函数，且\n\n\\[\nZ(8119)=2025,\\qquad Z(8120)=2026,\n\\]\n\n所以满足条件的最小正整数是\n\n\\[\n\\boxed{8120}.\n\\]\n\n---\n\n## 3. 验证\n\n\\[\nZ(8120)\n=\n\\left\\lfloor\\frac{8120}{5}\\right\\rfloor\n+\n\\left\\lfloor\\frac{8120}{25}\\right\\rfloor\n+\n\\left\\lfloor\\frac{8120}{125}\\right\\rfloor\n+\n\\left\\lfloor\\frac{8120}{625}\\right\\rfloor\n+\n\\left\\lfloor\\frac{8120}{3125}\\right\\rfloor\n\\]\n\n\\[\n=1624+324+64+12+2=2026.\n\\]\n\n而\n\n\\[\nZ(8119)=1623+324+64+12+2=2025.\n\\]\n\n因此 \\(8120!\\) 的十进制表示末尾恰好有 \\(2026\\) 个零，且没有更小的正整数满足条件。\n\n最终答案：\n\n\\[\n\\boxed{8120}\n\\]",
+  "reasoning_tail": " n=8104. Need exact. Let's compute f(n)=floor(n/5)+floor(n/25)+floor(n/125)+floor(n/625)+floor(n/3125)+floor(n/15625) (last zero for n<15625). Need f=2026.\n\nLet's compute around 8104.\n\nf(8104): floor 1620.8=1620; /25=324.16 ->324; /125=64.832 ->64; /625=12.9664 ->12; /3125=2.593 ->2; total 1620+324\n"
+}

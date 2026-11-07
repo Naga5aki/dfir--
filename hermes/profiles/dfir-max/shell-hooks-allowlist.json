@@ -1,0 +1,16 @@
+{
+  "approvals": [
+    {
+      "approved_at": "2026-10-24T01:16:58.796455Z",
+      "command": "D:/ForensicsAgent/hermes/bin/dfir_router.py",
+      "event": "pre_llm_call",
+      "script_mtime_at_approval": "2026-10-23T16:50:05.689527Z"
+    },
+    {
+      "approved_at": "2026-10-25T15:57:21.308167Z",
+      "command": "D:/llm/ensure_local_ready.py --hook",
+      "event": "pre_llm_call",
+      "script_mtime_at_approval": "2026-10-24T17:06:33.831053Z"
+    }
+  ]
+}

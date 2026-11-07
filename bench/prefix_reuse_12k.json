@@ -1,0 +1,23 @@
+{
+  "raw_content_tokens": 11818,
+  "run1": {
+    "cache_prompt": true,
+    "prompt_tokens": 11870,
+    "cache_n": 42,
+    "prompt_ms": 12187.111,
+    "prompt_tps": 970.533541542372,
+    "decode_tps": 27.10539559577873,
+    "wall_s": 16.912,
+    "finish": "length"
+  },
+  "run2": {
+    "cache_prompt": true,
+    "prompt_tokens": 11870,
+    "cache_n": 11866,
+    "prompt_ms": 119.536,
+    "prompt_tps": 33.4627225271048,
+    "decode_tps": 27.135250420970294,
+    "wall_s": 4.826,
+    "finish": "length"
+  }
+}

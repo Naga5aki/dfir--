@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-10-30T21:25:59",
+  "records": [
+    {
+      "label": "math_budget_2048",
+      "timestamp": "2026-10-30T21:21:56",
+      "budget_requested": 2048,
+      "max_tokens": 4608,
+      "prompt_tokens": 91,
+      "completion_tokens": 3183,
+      "cache_n": 0,
+      "prompt_tps": 263.9953815313473,
+      "decode_tps": 27.45868466808098,
+      "ttft_est_s": 0.38112135040854805,
+      "wall_s": 116.26,
+      "finish_reason": "stop",
+      "reasoning_chars": 3752,
+      "content_chars": 1855,
+      "reasoning_tokens": 2048,
+      "reasoning_tail": "equal values. Sum fracs beyond 4: 0.1825+0.01825+...=0.202777... total sum fracs=1.7777. OK.\n\nIf only finite terms up to 10000, f(n)=floor(n/10)+...+floor(n/10000) for n<100000. Bound f(n) > n/9 - (sum of tail?) Actually f(n) = n/9 - sum_{k>=1} {n/10^k}. Sum fracs < number of terms? Infinite sum of\n",
+      "content": "设 \\(Z(n)\\) 为 \\(n!\\) 末尾零的个数，则\n\n\\[\nZ(n)=v_{10}(n!)=v_5(n!)=\\sum_{k\\ge 1}\\left\\lfloor \\frac{n}{10^k}\\right\\rfloor .\n\\]\n\n要求最小的正整数 \\(n\\)，使得\n\n\\[\nZ(n)=2026.\n\\]\n\n---\n\n## 1. 用不等式缩小范围\n\n因为\n\n\\[\nZ(n)=\\sum_{k\\ge 1}\\left\\lfloor \\frac{n}{10^k}\\right\\rfloor\n< \\sum_{k\\ge 1}\\frac{n}{10^k}\n= \\frac{n}{9},\n\\]\n\n所以若 \\(Z(n)=2026\\)，则\n\n\\[\n2026<\\frac{n}{9}\n\\quad\\Longrightarrow\\quad\nn>9\\cdot 2026=18234.\n\\]\n\n另一方面，对 \\(n<100000\\)，只有前四项可能非零：\n\n\\[\nZ(n)=\\left\\lfloor \\frac n{10}\\right\\rfloor+\n\\left\\lfloor \\frac n{100}\\right\\rfloor+\n\\left\\lfloor \\frac n{1000}\\right\\rfloor+\n\\left\\lfloor \\frac n{10000}\\right\\rfloor.\n\\]\n\n于是\n\n\\[\nZ(n)\n> \\frac n{10}+\\frac n{100}+\\frac n{1000}+\\frac n{10000}-4\n= \\frac{1111n}{10000}-4.\n\\]\n\n若 \\(Z(n)=2026\\)，则\n\n\\[\n2026>\\frac{1111n}{10000}-4,\n\\]\n\n即\n\n\\[\n2030>\\frac{1111n}{10000}\n\\quad\\Longrightarrow\\quad\nn<\\frac{2030\\cdot 10000}{1111}\\approx 18271.8.\n\\]\n\n因此只需检查\n\n\\[\n18235\\le n\\le 18271.\n\\]\n\n---\n\n## 2. 在小区间内精确计算\n\n在这个范围内，\n\n\\[\n\\left\\lfloor \\frac n{10000}\\right\\rfloor=1,\n\\]\n\n所以\n\n\\[\nZ(n)=\\left\\lfloor \\frac n{10}\\right\\rfloor+\n\\left\\lfloor \\frac n{100}\\right\\rfloor+\n\\left\\lfloor \\frac n{1000}\\right\\rfloor+1.\n\\]\n\n我们寻找最小的 \\(n\\) 使 \\(Z(n)=2026\\)。\n\n先看 \\(n=18249\\)：\n\n\\[\n\\left\\lfloor \\frac{18249}{10}\\right\\rfloor=1824,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18249}{100}\\right\\rfloor=182,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18249}{1000}\\right\\rfloor=18,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18249}{10000}\\right\\rfloor=1.\n\\]\n\n因此\n\n\\[\nZ(18249)=1824+182+18+1=2025.\n\\]\n\n再看 \\(n=18250\\)：\n\n\\[\n\\left\\lfloor \\frac{18250}{10}\\right\\rfloor=1825,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18250}{100}\\right\\rfloor=182,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18250}{1000}\\right\\rfloor=18,\n\\]\n\n\\[\n\\left\\lfloor \\frac{18250}{10000}\\right\\rfloor=1.\n\\]\n\n因此\n\n\\[\nZ(18250)=1825+182+18+1=2026.\n\\]\n\n由于 \\(Z(n)\\) 是单调不减函数，且 \\(Z(18249)=2025\\)，所以不存在小于 \\(18250\\) 的正整数使末尾零数达到 \\(2026\\)。\n\n---\n\n## 3. 最终答案\n\n\\[\n\\boxed{18250}\n\\]\n\n即最小的正整数 \\(n\\) 为\n\n\\[\n\\boxed{18250}.\n\\]"
+    },
+    {
+      "label": "math_budget_4096",
+      "timestamp": "2026-10-30T21:24:45",
+      "budget_requested": 4096,
+      "max_tokens": 4608,
+      "prompt_tokens": 91,
+      "completion_tokens": 4608,
+      "cache_n": 0,
+      "prompt_tps": 293.0417085297679,
+      "decode_tps": 27.701472623994125,
+      "ttft_est_s": 0.3466351638810506,
+      "wall_s": 166.643,
+      "finish_reason": "length",
+      "reasoning_chars": 8229,
+      "content_chars": 863,
+      "reasoning_tokens": 4096,
+      "reasoning_tail": "actly 2026 trailing zeros, not at least. Yes.\n\nNeed final integer answer: 18250.\n\nNeed provide full derivation, key inequalities. Could include general formula, monotonicity, lower bound, upper bound.\n\nLet's think if there is any possibility of n smaller with Z=2026 due to jumps? No because max for\n",
+      "content": "设 \\(Z(n)\\) 表示 \\(n!\\) 末尾零的个数。末尾零的个数等于 \\(n!\\) 中因子 \\(10=2\\cdot 5\\) 的个数，而 \\(2\\) 的因子总是多于 \\(5\\) 的因子，因此\n\n\\[\nZ(n)=v_5(n!)=\\left\\lfloor \\frac n{10}\\right\\rfloor+\\left\\lfloor \\frac n{100}\\right\\rfloor+\\left\\lfloor \\frac n{1000}\\right\\rfloor+\\left\\lfloor \\frac n{10000}\\right\\rfloor+\\cdots\n\\]\n\n要求最小的正整数 \\(n\\)，使得\n\n\\[\nZ(n)=2026.\n\\]\n\n---\n\n## 1. 先给出一个下界\n\n因为对每个 \\(k\\ge 1\\)，有\n\n\\[\n\\left\\lfloor \\frac n{10^k}\\right\\rfloor < \\frac n{10^k},\n\\]\n\n所以\n\n\\[\nZ(n)<\\sum_{k=1}^{\\infty}\\frac n{10^k}\n=\\frac n{9}.\n\\]\n\n若 \\(Z(n)=2026\\)，则\n\n\\[\n2026<\\frac n{9},\n\\]\n\n即\n\n\\[\nn>9\\cdot 2026=18234.\n\\]\n\n因此\n\n\\[\nn\\ge 18235.\n\\]\n\n---\n\n## 2. 检查 \\(n<18250\\) 是否可能\n\n若 \\(n<18250\\)，则 \\(n\\le 18249\\)。此时\n\n\\[\n\\left\\lfloor \\frac n{10}\\right\\rfloor\\le 1824,\n\\]\n\n\\[\n\\left\\lfloor \\frac n{100}\\right\\rfloor\\le 182,\n\\]\n\n\\[\n\\left\\lfloor \\frac n{1000}\\right\\rfloor\\le 18,\n\\]\n\n\\[\n\\left\\lfloor \\frac n{10000}\\right\\rfloor\\le 1,\n\\"
+    },
+    {
+      "label": "longfact_55k",
+      "timestamp": "2026-10-30T21:25:59",
+      "budget_requested": 2048,
+      "max_tokens": 128,
+      "prompt_tokens": 55483,
+      "completion_tokens": 128,
+      "cache_n": 0,
+      "prompt_tps": 833.1441291441724,
+      "decode_tps": 22.69209753956912,
+      "ttft_est_s": 66.6387882047244,
+      "wall_s": 72.222,
+      "finish_reason": "length",
+      "reasoning_chars": 155,
+      "content_chars": 30,
+      "reasoning_tokens": 98,
+      "reasoning_tail": "用户要求只回答样本 Z9Q7 的采集时间和 SHA-256 前缀。需要从给定文本中提取最后一条：样本编号 Z9Q7，采集时间 2026-10-30T23:59:59+08:00，证据文件 evidence_Z9Q7.bin，SHA-256 前缀 deadbeefcafebabe。必须只回答这两个字段。中文。\n",
+      "content": "采集时间：2026-10-30T23:59:59+08:00",
+      "raw_prompt_tokens": 55431
+    }
+  ]
+}

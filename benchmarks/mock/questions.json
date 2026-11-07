@@ -1,0 +1,288 @@
+[
+  {
+    "q": 1,
+    "case": "mobile",
+    "text": "手机设备的 device_name 是什么？",
+    "expected": {
+      "domain": "mobile",
+      "task": "locate",
+      "profile": "dfir-myos",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 2,
+    "case": "mobile",
+    "text": "手机便签里的嫌疑人 PC 开机密码是什么？",
+    "expected": {
+      "domain": "mobile",
+      "task": "credential",
+      "profile": "dfir-myos",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 3,
+    "case": "mobile",
+    "text": "手机便签里的接头暗号是什么？",
+    "expected": {
+      "domain": "mobile",
+      "task": "credential",
+      "profile": "dfir-myos",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 4,
+    "case": "mobile",
+    "text": "手机便签里的秘钥环是什么？",
+    "expected": {
+      "domain": "mobile",
+      "task": "credential",
+      "profile": "dfir-myos",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 5,
+    "case": "mobile",
+    "text": "手机纪念日应用里最重要的日子是什么时候？",
+    "expected": {
+      "domain": "mobile",
+      "task": "date",
+      "profile": "dfir-myos",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 6,
+    "case": "mobile",
+    "text": "微信聊天记录数据库的文件名是什么？",
+    "expected": {
+      "domain": "mobile",
+      "task": "locate",
+      "profile": "dfir-myos",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 7,
+    "case": "mobile",
+    "text": "微信账号对应的 UIN 是多少？",
+    "expected": {
+      "domain": "mobile",
+      "task": "count",
+      "profile": "dfir-myos",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 8,
+    "case": "mobile",
+    "text": "微信聊天记录数据库的加密秘钥是什么？",
+    "expected": {
+      "domain": "mobile",
+      "task": "credential",
+      "profile": "dfir-max",
+      "tier": "deep"
+    }
+  },
+  {
+    "q": 9,
+    "case": "pc",
+    "text": "PC 注册表里最后登录用户是谁？",
+    "expected": {
+      "domain": "pc",
+      "task": "locate",
+      "profile": "dfir",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 10,
+    "case": "pc",
+    "text": "PC 本地账户的开机密码是什么？",
+    "expected": {
+      "domain": "pc",
+      "task": "credential",
+      "profile": "dfir",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 11,
+    "case": "pc",
+    "text": "PC 文件系统的时间线是什么？",
+    "expected": {
+      "domain": "pc",
+      "task": "timeline",
+      "profile": "dfir",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 12,
+    "case": "network",
+    "text": "pcap 中 DNS 查询了哪些域名？",
+    "expected": {
+      "domain": "network",
+      "task": "network",
+      "profile": "dfir-pcap",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 13,
+    "case": "network",
+    "text": "pcap 里有没有明文密码？",
+    "expected": {
+      "domain": "network",
+      "task": "credential",
+      "profile": "dfir-pcap",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 14,
+    "case": "memory",
+    "text": "内存镜像里的进程列表是什么？",
+    "expected": {
+      "domain": "memory",
+      "task": "locate",
+      "profile": "dfir-mem",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 15,
+    "case": "memory",
+    "text": "内存镜像里有没有登录密码？",
+    "expected": {
+      "domain": "memory",
+      "task": "credential",
+      "profile": "dfir-mem",
+      "tier": "deep"
+    }
+  },
+  {
+    "q": 16,
+    "case": "reverse",
+    "text": "APK 的加密算法是什么？",
+    "expected": {
+      "domain": "reverse",
+      "task": "reverse",
+      "profile": "dfir-max",
+      "tier": "deep"
+    }
+  },
+  {
+    "q": 17,
+    "case": "reverse",
+    "text": "so 文件里的密钥是什么？",
+    "expected": {
+      "domain": "reverse",
+      "task": "credential",
+      "profile": "dfir-re",
+      "tier": "deep"
+    }
+  },
+  {
+    "q": 18,
+    "case": "generic",
+    "text": "检材中的嫌疑人姓名是什么？",
+    "expected": {
+      "domain": "generic",
+      "task": "locate",
+      "profile": "dfir",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 19,
+    "case": "generic",
+    "text": "请分析检材并回答结论。",
+    "expected": {
+      "domain": "generic",
+      "task": "unknown",
+      "profile": "dfir",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 20,
+    "case": "generic",
+    "text": "跨检材关联的时间线是什么？",
+    "expected": {
+      "domain": "generic",
+      "task": "timeline",
+      "profile": "dfir-max",
+      "tier": "deep"
+    }
+  },
+  {
+    "q": 21,
+    "case": "linux",
+    "text": "Linux 服务器的 SSH 登录记录在哪里？",
+    "expected": {
+      "domain": "linux",
+      "task": "locate",
+      "profile": "dfir",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 22,
+    "case": "mac",
+    "text": "macOS Keychain 里的密码是什么？",
+    "expected": {
+      "domain": "mac",
+      "task": "credential",
+      "profile": "dfir",
+      "tier": "complex"
+    }
+  },
+  {
+    "q": 23,
+    "case": "cloud",
+    "text": "S3 对象存储里的文件列表是什么？",
+    "expected": {
+      "domain": "cloud",
+      "task": "locate",
+      "profile": "dfir",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 24,
+    "case": "email",
+    "text": "EML 邮件的发件人是谁？",
+    "expected": {
+      "domain": "email",
+      "task": "locate",
+      "profile": "dfir",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 25,
+    "case": "database",
+    "text": "MySQL 数据库里的用户表有哪些？",
+    "expected": {
+      "domain": "database",
+      "task": "locate",
+      "profile": "dfir",
+      "tier": "base"
+    }
+  },
+  {
+    "q": 26,
+    "case": "linux",
+    "text": "Linux 的 syslog 时间线是什么？",
+    "expected": {
+      "domain": "linux",
+      "task": "timeline",
+      "profile": "dfir",
+      "tier": "complex"
+    }
+  }
+]

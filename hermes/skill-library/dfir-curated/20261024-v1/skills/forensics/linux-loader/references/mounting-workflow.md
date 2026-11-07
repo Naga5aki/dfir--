@@ -1,0 +1,73 @@
+# Mounting Workflow
+
+读取时机: 挂载失败、WSL2 loop/FUSE 诊断、E01 降级、LVM/LUKS、文件系统只读参数或验证夹具需要时读取。
+
+## WSL2 Preflight
+
+- 记录 `uname -a`、`/proc/version`、是否 WSL2。
+- 自动检查并记录权限状态：root、`sudo` 是否存在、`sudo -n true` 是否可用。
+- 权限探测顺序固定为 root -> `sudo -n true` -> 用户选择；不要暴露额外 sudo 模式。
+- 没有 root/非交互 sudo 时，将 privileged command 标记为 `blocked=true`，输出 `user_choices`。挂载需在可信提权终端重新运行 helper，不提供可绕过只读验证的裸 mount 命令；其他前置命令可提供 `manual_command`。
+- 检查输出目录和挂载根目录绝对路径；挂载根被占用时换到 `/mnt/ev-mount-<case-id>/`。
+- E01 路径检查 `ewfinfo`、`ewfmount`、`ewfexport`、`/dev/fuse` 是否存在且当前用户可读写、`fusermount` 或 `fusermount3`。
+
+## Sudo handling
+
+- 脚本先试 root 和 `sudo -n true`。成功时才可自动执行需要权限的只读挂载命令。
+- 失败时不要请求密码、不要重试裸命令；JSON 必须包含 `blocked=true`、`block_reason`。挂载命令带 `verification_required=true`。
+- 同时给出两个用户选择:
+  - `manual_sudo`: 用户在可信 Linux/WSL 终端以 root 权限重新运行挂载 helper。
+  - `interactive_sudo`: 用户在可信终端用 `sudo python3 <skill-root>/scripts/mount_evidence.py ...` 运行相同案件并交互输入密码。
+- 缺 `ewf-tools` 时只输出需确认的 `apt-get install -y ewf-tools` 计划；如果 apt 或 sudo 不可用，附带 `download_portable_ewftools`。
+- `download_portable_ewftools` 必须使用 `wget` 或 `curl` 下载用户确认的包，路径固定在系统临时缓存下，如 `/tmp/linux-loader-cache/<case-id>/ewf-tools/`；不要写入 `/usr`、`/usr/local`、挂载检材或工作目录根。
+- 便携下载命令使用 `LINUX_LOADER_EWFTOOLS_URLS` 接收可信 `.deb` 或 tarball URL，下载到 `downloads/`，解压到 `root/`，再从缓存内查找 `ewfmount`、`ewfexport`、`ewfinfo`。
+
+## Known-good loop fixture
+
+用固定小镜像区分“用户镜像没有分区表”和“WSL2 `losetup -P` 失败”。
+
+```bash
+tmpdir="$(mktemp -d)"
+img="$tmpdir/linux-loader-loop-probe.img"
+dd if=/dev/zero of="$img" bs=1M count=50
+printf 'label: dos\n,40M,L,*\n' | sfdisk "$img"
+loop="$(sudo losetup --find --show --read-only -P "$img")"
+ls "${loop}"p* 2>/dev/null
+sudo losetup -d "$loop"
+rm -rf "$tmpdir"
+```
+
+预期: 已知有分区表的小镜像应生成类似 `/dev/loop0p1`。若只有 loop 设备但无分区节点，记录 `losetup_partition_scan=failed` 并改走 offset mount。
+
+## Raw/dd/img mount priority
+
+1. `losetup --read-only -P`，仅在 loop attach 和 partition scan 都通过时使用。
+2. 无分区节点时，为确认的字节偏移创建 `losetup --find --show --read-only --offset <bytes>`，已知分区长度时加 `--sizelimit <bytes>`；先以 `blockdev --getro <loop>` 验证返回 `1`，再挂载该 loop 设备。不要让 mount 隐式建立未经验证的 loop。
+3. 只输出分区元数据和失败原因。
+
+## E01 flow
+
+- FUSE 可用定义：`/dev/fuse` 存在、当前用户可读写、存在 `fusermount` 或 `fusermount3`。
+- FUSE 可用时优先 `ewfmount`，再把 exposed raw 当作 raw/dd/img 处理。
+- FUSE 缺失、不可读写或 fusermount 缺失时，不要计划 `ewfmount`。
+- FUSE 不可用时提示用户二选一：提权/修复 FUSE 后重试，或在 `ewfexport` 可用时降级导出 raw。
+- FUSE 不可用但 `ewfexport` 可用时，输出需用户确认的导出计划，并先估算:
+  - `estimated_export_size`
+  - `estimated_export_time`
+  - `export_space_available`
+- 导出 raw 前必须让用户确认时间和磁盘占用。
+
+## Filesystem mount options
+
+- ext2/ext3/ext4: `ro,noload`
+- XFS: `ro,norecovery`
+- Btrfs: 先尝试 `ro,norecovery,skip_balance`；失败后按本机 `mount.btrfs` 支持情况尝试 `ro,nologreplay,skip_balance` 等只读选项。
+- unknown: 停止挂载，先用 `blkid -p` 等只读探针识别。整盘 filesystem image 同样需要确认类型，不能默认尝试 `ro,loop`。
+- helper 在 mount 后用 `findmnt --json --mountpoint` 核对实际来源、目标、文件系统和 `ro`。计划阶段的 `readonly=null` 不代表已经只读；只有验证成功才写 `true`。失败时卸载本次挂载并分离 loop，保存清理结果。
+- ext4 的 `ro` 仍可能触发日志回放，必须保留 `noload` 和设备写阻塞；依据 [Linux 内核 ext4 文档](https://www.kernel.org/doc/html/latest/admin-guide/ext4.html)。
+
+## LVM/LUKS
+
+- LVM: 识别 PV/VG/LV，记录 `pvs`, `vgs`, `lvs` 输出；v1 不自动激活。
+- LUKS: 识别后报告需要 passphrase/key；v1 不自动解密。
+- 可给用户手动继续提示，如 `vgchange -ay --readonly`，但必须说明先确认取证安全流程。

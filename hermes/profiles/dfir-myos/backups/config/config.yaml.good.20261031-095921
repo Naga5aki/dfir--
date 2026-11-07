@@ -1,0 +1,264 @@
+model:
+  default: qwen3.8-27b-forensics
+  provider: local-think
+  context_length: 65536
+  api_mode: chat_completions
+
+# 同一台 llama-server 的两个“模型入口”：
+#   /model think -> 开启思考
+#   /model plain -> 关闭思考
+providers:
+  local-think:
+    base_url: http://127.0.0.1:8095/v1
+    api_key: ${LLAMA_API_KEY}
+    api_mode: chat_completions
+    request_timeout_seconds: 600
+    stale_timeout_seconds: 180
+    model: qwen3.8-27b-forensics
+    extra_body:
+      chat_template_kwargs:
+        enable_thinking: true
+    models:
+      qwen3.8-27b-forensics: {}
+  local-plain:
+    base_url: http://127.0.0.1:8095/v1
+    api_key: ${LLAMA_API_KEY}
+    api_mode: chat_completions
+    request_timeout_seconds: 600
+    stale_timeout_seconds: 180
+    model: qwen3.8-27b-forensics
+    extra_body:
+      chat_template_kwargs:
+        enable_thinking: false
+    models:
+      qwen3.8-27b-forensics: {}
+
+model_aliases:
+  think:
+    model: qwen3.8-27b-forensics
+    provider: local-think
+  plain:
+    model: qwen3.8-27b-forensics
+    provider: local-plain
+
+terminal:
+  # 手机取证对象在 Windows 的 dokan 挂载盘上，终端必须是本机，
+  # 否则 read_file/shell 会走 SSH 到 Kali，读不到挂载路径。
+  backend: local
+  cwd: "D:/forensics/cases"
+  timeout: 180
+  persistent_shell: true
+
+mcp_servers:
+  didctf-ag-1861d72d:
+    url: "https://forensics.didctf.com/api/arena/mcp"
+    headers:
+      Authorization: "Bearer ${DIDCTF_AGENT_TOKEN}"
+    enabled: true
+    timeout: 120
+    tools:
+      resources: false
+      prompts: false
+  myos-forensics:
+    command: D:/MYOS/Client/tools/mcp/myos_mcp_server.exe
+    enabled: true
+    tools:
+      include:
+        - myos-forensics.health_check_dbus
+        - myos-forensics.query_cases
+        - myos-forensics.query_open_cases
+        - myos-forensics.open_case
+        - myos-forensics.query_materials
+        - myos-forensics.load_case
+        - myos-forensics.query_computer_forensics_results_overview
+        - myos-forensics.query_device_info
+        - myos-forensics.query_device_mount_path
+        - myos-forensics.query_current_node_data
+        - myos-forensics.quick_search_files
+        - myos-forensics.sqlite_query
+        - myos-forensics.create_file_index_task
+        - myos-forensics.quick_search_content
+        - myos-forensics.global_search_content
+        - myos-forensics.query_task_status
+        - myos-forensics.wait_task_completion
+        - myos-forensics.query_phone_forensics_results_overview
+        - myos-forensics.query_encrypt_types
+        - myos-forensics.decrypt_partition
+        - myos-forensics.query_decrypt_task_status
+        - myos-forensics.restart_computer_forensics
+      resources: false
+      prompts: false
+    timeout: 300
+
+agent:
+  max_turns: 18
+  run_budget_seconds: 900
+  save_trajectories: true
+
+display:
+  show_reasoning: true
+  streaming: true
+  language: zh
+  tool_progress: all
+
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+  nudge_interval: 0
+
+tool_loop_guardrails:
+  hard_stop_enabled: true
+
+_config_version: 51
+
+platform_toolsets:
+  cli:
+    - clarify
+    - code_execution
+    - file
+    - memory
+    - session_search
+    - skills
+    - terminal
+    - todo
+    - web
+
+gateway:
+  standalone: true
+
+  service_install_choice: install
+hooks:
+  pre_llm_call:
+    - command: "D:/llm/ensure_local_ready.py --hook"
+      timeout: 180
+    - command: "D:/ForensicsAgent/hermes/bin/dfir_router.py"
+      timeout: 10
+
+hooks_auto_accept: true
+
+telemetry:
+  shared_metrics:
+    enabled: false
+    send: false
+    offer_version: 2
+auxiliary:
+  title_generation:
+    model_upgrade_enabled: false
+  # DFIR: compression is a background summarization task; thinking off is
+  # faster and avoids spending the task budget on hidden reasoning tokens.
+  compression:
+    provider: local-plain
+    model: qwen3.8-27b-forensics
+    timeout: 600
+  # Background review competes with the single local model slot; disable it
+  # for DFIR profiles (case notes are written explicitly instead).
+  background_review:
+    enabled: false
+onboarding:
+  seen:
+    tool_progress_prompt: true
+    busy_input_prompt: true
+
+# 手机取证提效：让 deferred MCP 工具的真实名常驻 tool_search 描述，
+# 避免"猜自然名 -> not a known tool name -> 再 tool_search"的 2-4 轮浪费。
+tools:
+  tool_search:
+    enabled: "on"
+    listing: "on"
+    listing_max_tokens: 6000
+    threshold_pct: 10
+
+# Allow the local loading wait to finish before the hook dispatcher continues.
+plugins:
+  hook_callback_timeout: 200
+
+# 2026-10-31: 精简技能索引，仅保留 19 个（15 核心 + maps/systematic-debugging/codebase-inspection/plan）。
+skills:
+  disabled:
+    - airtable
+    - apple-notes
+    - apple-reminders
+    - architecture-diagram
+    - arxiv
+    - ascii-art
+    - ascii-video
+    - baoyu-infographic
+    - blocked-page-recovery
+    - blogwatcher
+    - box
+    - claude-code
+    - claude-design
+    - codex
+    - collective-wisdom-install
+    - comfyui
+    - competitor-news-monitor
+    - computer-use
+    - design-md
+    - document-to-action-items
+    - docx
+    - dogfood
+    - email-inbox-triage
+    - evaluating-llms-harness
+    - excalidraw
+    - findmy
+    - gated-knowledge-promotion
+    - gif-search
+    - github
+    - github-auth
+    - github-code-review
+    - github-issue-to-pr
+    - github-issues
+    - github-pr-workflow
+    - github-repo-management
+    - google-workspace
+    - grounded-citations
+    - hermes-agent-skill-authoring
+    - hermes-environment-audit
+    - hermes-migration
+    - himalaya
+    - huggingface-hub
+    - humanizer
+    - imessage
+    - inspecting-hermes-desktop-dom
+    - llama-cpp
+    - llm-wiki
+    - manim-video
+    - meeting-action-items
+    - merge-reconciler
+    - nano-pdf
+    - node-inspect-debugger
+    - notion
+    - obsidian
+    - ocr-and-documents
+    - opencode
+    - openhue
+    - p5js
+    - pdf
+    - persistent-memory
+    - phase-gated-docx-learning
+    - popular-web-designs
+    - powerpoint
+    - pretext
+    - product-price-monitor
+    - project-skill-maintenance
+    - python-debugpy
+    - requesting-code-review
+    - research-paper-writing
+    - sdlc-review
+    - serving-llms-vllm
+    - session-librarian
+    - simplify-code
+    - sketch
+    - songsee
+    - songwriting-and-ai-music
+    - spike
+    - teams-meeting-pipeline
+    - test-driven-development
+    - touchdesigner-mcp
+    - utm-forensic-cli
+    - weekly-review-planning
+    - weights-and-biases
+    - writing-helper
+    - xlsx
+    - xurl
+    - youtube-content

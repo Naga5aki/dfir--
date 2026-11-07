@@ -1,0 +1,73 @@
+# ---- large or local-only ----
+/wsl/
+/llm/
+/tmp/
+/refs/
+/tools/wireshark/
+/_hexp_review_20261106/
+/.screenshots/
+/.claude/
+/.superpowers/
+
+# ---- secrets ----
+**/.env
+**/.env.*
+!**/.env.example
+**/*.key
+**/*.pem
+**/secrets/
+
+# ---- hermes runtime ----
+/hermes/installs/
+/hermes/cache/
+/hermes/mcp-runtime/
+/hermes/state/
+/hermes/sessions/
+/hermes/audio_cache/
+/hermes/image_cache/
+/hermes/pairing/
+/hermes/hooks/
+/hermes/cron/
+/hermes/logs/
+/hermes/kanban/
+/hermes/memories/
+**/auth.json
+**/channel_directory.json
+**/gateway_state.json
+**/gateway.heartbeat
+**/state/
+
+# ---- per-profile runtime ----
+**/state.db
+**/state.db-*
+**/*.log
+**/logs/
+**/cache/
+**/sessions/
+**/memories/
+**/cron/
+**/pastes/
+**/.backup-*/
+**/*.bak
+**/*.bak-*
+**/__pycache__/
+**/*.pyc
+**/.mcp-discovery.lock
+**/gateway.lock
+**/gateway.pid
+**/*.lock
+
+# ---- generated caches ----
+**/.hub/index-cache/
+**/models_dev_cache.json
+**/mcp_schema_cache.json
+**/reasoning_caps.json
+**/plugin_toolset_keys.json
+**/local_endpoint_probes.json
+**/nous_recommended_cache.json
+**/openrouter_curated_catalog.json
+**/spillover/
+
+# ---- contest answers and case notes ----
+**/references/2025fic-computer.md
+/reports/2025FIC*.md

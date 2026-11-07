@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    "dfir",
+    "dfir-myos",
+    "dfir-re",
+    "dfir-mem",
+    "dfir-pcap",
+    "dfir-max"
+  ],
+  "managed_paths": [
+    "model",
+    "terminal",
+    "skills.auto_load",
+    "hooks",
+    "platform_toolsets",
+    "auxiliary.title_generation.model_upgrade_enabled"
+  ],
+  "values": {
+    "model": {
+      "default": "qwen3.8-27b-forensics",
+      "provider": "local-think",
+      "context_length": 65536,
+      "api_mode": "chat_completions"
+    },
+    "terminal": {
+      "backend": "ssh",
+      "cwd": "/mnt/d/forensics/cases",
+      "timeout": 180,
+      "ssh_host": "127.0.0.1",
+      "ssh_user": "root",
+      "ssh_port": 2222,
+      "ssh_key": "C:/Users/TWK/.ssh/hermes_kali_ed25519",
+      "persistent_shell": true
+    },
+    "skills.auto_load": [
+      "cyber-library"
+    ],
+    "hooks": {
+      "pre_llm_call": [
+        {
+          "command": "D:/ForensicsAgent/hermes/bin/dfir_router.py",
+          "timeout": 10
+        }
+      ]
+    },
+    "platform_toolsets": {
+      "cli": [
+        "clarify",
+        "code_execution",
+        "file",
+        "memory",
+        "session_search",
+        "skills",
+        "terminal",
+        "todo",
+        "web"
+      ]
+    },
+    "auxiliary.title_generation.model_upgrade_enabled": false
+  }
+}

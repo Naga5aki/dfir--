@@ -1,0 +1,229 @@
+model:
+  default: qwen3.8-27b-forensics
+  provider: local-think
+  context_length: 65536
+  api_mode: chat_completions
+
+# 同一台 llama-server 的两个“模型入口”：
+#   /model think -> 开启思考
+#   /model plain -> 关闭思考
+providers:
+  local-think:
+    base_url: http://127.0.0.1:8095/v1
+    api_key: ${LLAMA_API_KEY}
+    api_mode: chat_completions
+    model: qwen3.8-27b-forensics
+    extra_body:
+      chat_template_kwargs:
+        enable_thinking: true
+    models:
+      qwen3.8-27b-forensics: {}
+  local-plain:
+    base_url: http://127.0.0.1:8095/v1
+    api_key: ${LLAMA_API_KEY}
+    api_mode: chat_completions
+    model: qwen3.8-27b-forensics
+    extra_body:
+      chat_template_kwargs:
+        enable_thinking: false
+    models:
+      qwen3.8-27b-forensics: {}
+
+model_aliases:
+  think:
+    model: qwen3.8-27b-forensics
+    provider: local-think
+  plain:
+    model: qwen3.8-27b-forensics
+    provider: local-plain
+
+terminal:
+  # 本机后端：read_file/shell 在 Windows 执行，才能读取 D 盘内存镜像
+  backend: local
+  cwd: "D:/forensics/cases"
+  timeout: 180
+  persistent_shell: true
+
+mcp_servers:
+  memforensics:
+    command: D:\CTF_Misc_Tools\Forensics\volatility\mem-forensics-mcp\.venv\Scripts\python.exe
+    args:
+      - -m
+      - mem_forensics_mcp.server
+    connect_timeout: 60.0
+    enabled: true
+    cwd: D:/Hermes/SecurityLab/work/mem-forensics
+    timeout: 300
+  case_fs:
+    command: C:/Program Files/nodejs/node.exe
+    args:
+      - D:/ForensicsAgent/hermes/mcp-runtime/case-fs-2026.8.31/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js
+      - "D:/forensics/cases"
+    enabled: true
+    tools:
+      include:
+        - read_file
+        - read_multiple_files
+        - list_directory
+        - directory_tree
+        - search_files
+        - get_file_info
+      resources: false
+      prompts: false
+    timeout: 120
+
+  lovelymem:
+    url: "http://127.0.0.1:17621/mcp"
+    headers:
+      Authorization: "Bearer 990PevUHEEDDMad__glJF8Xdbet5QmARjgNx1zvdP7o"
+    enabled: true
+    connect_timeout: 30.0
+    timeout: 300
+agent:
+  max_turns: 26
+  run_budget_seconds: 1500
+  save_trajectories: true
+
+display:
+  show_reasoning: true
+  streaming: true
+  language: zh
+  tool_progress: all
+
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+  nudge_interval: 0
+
+tool_loop_guardrails:
+  hard_stop_enabled: true
+
+_config_version: 51
+
+platform_toolsets:
+  cli:
+    - clarify
+    - code_execution
+    - file
+    - memory
+    - session_search
+    - skills
+    - terminal
+    - todo
+    - web
+
+gateway:
+  standalone: true
+
+hooks:
+  pre_llm_call:
+    - command: "D:/llm/ensure_local_ready.py --hook"
+      timeout: 180
+    - command: "D:/ForensicsAgent/hermes/bin/dfir_router.py"
+      timeout: 10
+
+hooks_auto_accept: true
+
+telemetry:
+  shared_metrics:
+    enabled: false
+    send: false
+    offer_version: 2
+auxiliary:
+  title_generation:
+    model_upgrade_enabled: false
+
+# Allow the local loading wait to finish before the hook dispatcher continues.
+plugins:
+  hook_callback_timeout: 200
+
+# 2026-10-31: 精简技能索引，仅保留 19 个（15 核心 + maps/systematic-debugging/codebase-inspection/plan）。
+skills:
+  disabled:
+    - airtable
+    - apple-notes
+    - apple-reminders
+    - architecture-diagram
+    - arxiv
+    - ascii-art
+    - ascii-video
+    - baoyu-infographic
+    - blocked-page-recovery
+    - blogwatcher
+    - box
+    - claude-code
+    - claude-design
+    - codex
+    - collective-wisdom-install
+    - comfyui
+    - competitor-news-monitor
+    - computer-use
+    - design-md
+    - document-to-action-items
+    - docx
+    - dogfood
+    - email-inbox-triage
+    - evaluating-llms-harness
+    - excalidraw
+    - findmy
+    - gated-knowledge-promotion
+    - gif-search
+    - github
+    - github-auth
+    - github-code-review
+    - github-issue-to-pr
+    - github-issues
+    - github-pr-workflow
+    - github-repo-management
+    - google-workspace
+    - grounded-citations
+    - hermes-agent-skill-authoring
+    - hermes-environment-audit
+    - hermes-migration
+    - himalaya
+    - huggingface-hub
+    - humanizer
+    - imessage
+    - inspecting-hermes-desktop-dom
+    - llama-cpp
+    - llm-wiki
+    - manim-video
+    - meeting-action-items
+    - merge-reconciler
+    - nano-pdf
+    - node-inspect-debugger
+    - notion
+    - obsidian
+    - ocr-and-documents
+    - opencode
+    - openhue
+    - p5js
+    - pdf
+    - persistent-memory
+    - phase-gated-docx-learning
+    - popular-web-designs
+    - powerpoint
+    - pretext
+    - product-price-monitor
+    - project-skill-maintenance
+    - python-debugpy
+    - requesting-code-review
+    - research-paper-writing
+    - sdlc-review
+    - serving-llms-vllm
+    - session-librarian
+    - simplify-code
+    - sketch
+    - songsee
+    - songwriting-and-ai-music
+    - spike
+    - teams-meeting-pipeline
+    - test-driven-development
+    - touchdesigner-mcp
+    - utm-forensic-cli
+    - weekly-review-planning
+    - weights-and-biases
+    - writing-helper
+    - xlsx
+    - xurl
+    - youtube-content

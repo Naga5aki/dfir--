@@ -1,0 +1,8 @@
+model:
+  default: qwen3.8-27b-forensics
+  provider: custom
+  base_url: http://127.0.0.1:8095/v1
+  api_key: ${LLAMA_API_KEY}
+  context_length: 65536
+  api_mode: chat_completions
+_config_version: 51

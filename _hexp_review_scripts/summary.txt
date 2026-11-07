@@ -1,0 +1,24 @@
+== nested zip compare ==
+nested_size=116680 sha256=7d90c7ff6694d810fec7a38f9ecda042ee8e8c111446e687436eed5c689d36cf
+standalone_size=116680 sha256=7d90c7ff6694d810fec7a38f9ecda042ee8e8c111446e687436eed5c689d36cf
+byte_identical=True
+
+== avatars ==
+_zip_apk-analysis-expert.hexp/apk-analysis-expert/avatar.png: 1024x1024 bit=8 color=3 bytes=399699 sha256=c010e622c0441d8aba9273d3eb09deeb6964e922e4114b58c4ff70101e56bac1
+_zip_electronic-data-forensics-record-drafting.hexp/electronic-data-forensics-record-drafting/avatar.png: 256x256 bit=8 color=2 bytes=76841 sha256=4a453a71877b27513a19f555efc257d3f0ca3a48fb714189f57159a1b00d4086
+_zip_exe-reversing.hexp/exe-reversing/avatar.png: 512x512 bit=8 color=6 bytes=259293 sha256=290ae845b6ce3651af750baf1d2880eaa2659b603e3a31a224b24f902acdf748
+_zip_goldeneyes-forensics.hexp/goldeneyes-forensics/avatar.png: 256x256 bit=8 color=6 bytes=6320 sha256=59c2de17cd0eebe1e057d2b0fb43e83a8365175627ec0c6877327c1a3f4ce8e1
+_zip_memory-forensics.hexp/memory-forensics/avatar.png: 1254x1254 bit=8 color=3 bytes=413515 sha256=2cd248bd895ac8eb9b5f871369300aa5ef88b5cbe5579c16e823c0b43e41e426
+_zip_server-forensics-expert.hexp/server-forensics-expert/avatar.png: 256x256 bit=8 color=6 bytes=25885 sha256=d01c7244f69bcf6124700d41d34ed4452b29daf0351c087f848b63c6b95c4b23
+_zip_traffic-forensics.hexp/traffic-forensics/avatar.png: 1254x1254 bit=8 color=3 bytes=402111 sha256=b4985ddff9bdde1df320486f9eabdf14e075467fae3dfa999c5a7b1bebd95e40
+_zip_wmx-bill-analysis-expert.hexp/wmx-bill-analysis-expert/avatar.png: 512x512 bit=8 color=6 bytes=104872 sha256=375d1c6dcb09beb31c9916ee298254b9df8bfdbb858f3c937efbbaea026ee82c
+
+== expert frontmatter keys ==
+_zip_apk-analysis-expert.hexp/apk-analysis-expert/EXPERT.md: specVersion, name, displayName, profession, description, expertType, category, version, updatedAt, skills, defaultInitPrompt, quickPrompts
+_zip_electronic-data-forensics-record-drafting.hexp/electronic-data-forensics-record-drafting/EXPERT.md: specVersion, name, displayName, profession, description, expertType, category, avatar, version, updatedAt, skills, defaultInitPrompt, quickPrompts
+_zip_exe-reversing.hexp/exe-reversing/EXPERT.md: specVersion, name, displayName, profession, description, expertType, category, avatar, version, updatedAt, skills, externalTools, defaultInitPrompt, quickPrompts
+_zip_goldeneyes-forensics.hexp/goldeneyes-forensics/EXPERT.md: specVersion, name, displayName, profession, description, avatar, expertType, category, version, updatedAt, skills, externalTools, defaultInitPrompt, quickPrompts
+_zip_memory-forensics.hexp/memory-forensics/EXPERT.md: specVersion, name, displayName, profession, description, expertType, category, version, updatedAt, skills, externalTools, defaultInitPrompt, quickPrompts
+_zip_server-forensics-expert.hexp/server-forensics-expert/EXPERT.md: specVersion, name, displayName, profession, description, avatar, expertType, category, version, updatedAt, skills, defaultInitPrompt, quickPrompts
+_zip_traffic-forensics.hexp/traffic-forensics/EXPERT.md: specVersion, name, displayName, profession, description, expertType, category, avatar, version, updatedAt, skills, externalTools, defaultInitPrompt, quickPrompts
+_zip_wmx-bill-analysis-expert.hexp/wmx-bill-analysis-expert/EXPERT.md: specVersion, name, displayName, profession, description, expertType, category, avatar, version, updatedAt, skills, defaultInitPrompt, quickPrompts

@@ -1,0 +1,23 @@
+# Decision-record rounds (adopt / do-not-adopt)
+
+Use when a round's deliverable is a DECISION on an optional backend/tool/memory layer, driven by prior rounds' failure items, with no install authorized up front. Acceptance = decision record + evidence + independent review, NOT installation count — state that in the scope doc. Trainer-facing artifacts: Simplified Chinese.
+
+## Skeleton
+
+1. Freeze the round's scope doc first: decision-record nature, the plan sections defining the candidate space and the adoption threshold, and the stop rule — a found gap selects ONE candidate and stops for a separate download/install/data authorization; no self-authorized testing.
+2. Failure-item inventory, extracted BY SCRIPT from the prior rounds' records (never hand-listed): every item classed against the gap taxonomy the plan names (e.g. extraction / relation / vector-filtering), keeping record path + item text. Declared limits/carries are items; resolved first-fails are listed as closed, not as findings.
+3. Rule each gap hypothesis out against existing capability first, with read-only probes (stdlib, same corpus). The probe's extraction/normalization/threshold semantics must MIRROR the tool that produced the findings — read the tool's source and copy its definition (block splitting, normalization, minimum sizes), or you will "discover" scope differences and mistake them for capability gaps.
+4. Reconcile every probe-vs-tool delta numerically in its own artifact. When the probe flags more/less than the tool, re-run BOTH definitions over the same corpus and attribute each delta before judging (e.g. the tool's 3 pairs reproduced under its own fence-terminated block rule; the probe's extra 5 = all fenced-code blocks the tool excludes by design). The reconcile artifact is what makes a rule-out real.
+5. Quote the adoption threshold byte-exact from the frozen plan (regex-extract; assert byte-equality in the verify script). Never adjust it. State ceiling cases plainly — a baseline already at the frozen set's maximum gives any alternative nothing to exceed, so no candidate can satisfy net-gain and the plan's "keep the native baseline" branch governs.
+6. Doc shape: summary-first (decision + one-line rationale); inventory; gap table (hypothesis × evidence × existing coverage × verdict); candidate-vs-trigger check against each vendor's stated evaluation conditions; threshold section; reopening triggers (evidence-based conditions + "separate authorization required"; for in-corpus chores like dedup/near-dup, name a native small-tool enhancement as the preferred reopening path, not an external backend); resource/side-effect section (only-read, no downloads/installs — say it explicitly); appendix hash table of every evidence file and cited source record.
+7. Parent verify = mechanical citation checks, as its own numbered artifact: recompute every appendix hash; byte-equal the threshold quote against the plan; inventory items equal to their source records; zero-write proof (recompute the domain against the baseline); a forbidden-claims scan (no "已安装/已下载/已完成对比"-style phrasing); decision lines present.
+8. Review proportionality: one independent reviewer suffices for a no-install round. Require hands-on reproduction — re-run the read-only tool (`--checks <relevant>`), raw-byte check any "fenced/code" classification, recompute 2–3 similarity numbers with its own code, byte-check the quote, sample inventory-vs-source equality — plus explicit challenge statements on (a) misclassified failure items, (b) premature rule-outs, (c) consistency with the plan's decision branches. Contract: repo writes = the review JSON only; scratch = its own temp dir; FORBID re-running the round's evidence scripts (they embed `generated_at`; a re-run rewrites cited bytes — reproduce in scratch instead).
+9. Publish only after the review passes; append the round's record to the progress file; stop.
+
+## Pitfalls
+
+- "No gap" without the inventory + reconcile artifacts is an opinion a reviewer will reopen; both are cheap and mechanical — always produce them.
+- Treating the audited tool's findings as tool failures: duplicate/quality findings are content-side items for downstream editing decisions; counting them as backend gaps inflates the install case.
+- Letting a probe's wider scope stand as "the tool under-detects" — run step 4 before any such claim.
+- Absorbing external drift (files added by other writers while the round ran) into a fresh baseline without an in-baseline note; likewise never delete or edit another writer's files to force a domain set to match.
+- Re-running `generated_at`-bearing evidence scripts during review/verification: it breaks every cited hash. Forbid it in contracts; reproduce independently.
