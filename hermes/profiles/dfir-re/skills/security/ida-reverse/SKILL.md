@@ -91,3 +91,4 @@ idaapi.set_cmt(0x401000, "XOR decrypts the C2 packet", 0)
 - Use the GUI database when the user says "the IDA window I have open"; otherwise headless is fine.
 - If the IDA MCP is unreachable, tell the user to check the local service on `127.0.0.1:8737`; do not start another server.
 - For APK/JADX, use `android-malware-analysis`, not this skill.
+- 非 APK 二进制的阅读顺序、无符号函数命名和壳/混淆识别见 [references/binary-reading.md](references/binary-reading.md)。APK 里的 `.so` 先走 `android-malware-analysis`。

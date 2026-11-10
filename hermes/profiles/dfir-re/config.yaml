@@ -98,9 +98,11 @@ display:
   tool_progress: all
 
 memory:
-  memory_enabled: false
+  memory_enabled: true
   user_profile_enabled: false
   nudge_interval: 0
+  # 字符数，不是字节数。默认 2200 会挡住追加；内容本身不压缩。
+  memory_char_limit: 4000
 
 tool_loop_guardrails:
   hard_stop_enabled: true

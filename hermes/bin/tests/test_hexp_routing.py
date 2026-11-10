@@ -137,8 +137,9 @@ class DomainBoundaryTest(unittest.TestCase):
     root = Path(r"D:\ForensicsAgent\hermes\profiles")
     profiles = ("dfir", "dfir-max", "dfir-mem", "dfir-myos", "dfir-pcap", "dfir-re")
 
-    def _texts(self, rel: str) -> list[str]:
-        texts = [(self.root / name / rel).read_text(encoding="utf-8") for name in self.profiles]
+    def _texts(self, rel: str, names=None) -> list[str]:
+        names = self.profiles if names is None else names
+        texts = [(self.root / name / rel).read_text(encoding="utf-8") for name in names]
         self.assertEqual(len({hashlib.sha256(t.encode()).hexdigest() for t in texts}), 1, rel)
         for text in texts:
             self.assertEqual(check.forbidden_hits(text), [], rel)
@@ -149,15 +150,32 @@ class DomainBoundaryTest(unittest.TestCase):
         self.assertIn("YARA 只在用户给出规则时扫描", memory)
         self.assertIn("凭据提取不是初筛步骤", memory)
         self.assertIn("memory_extract_credentials", memory)
-        ida = self._texts("skills/security/ida-reverse/SKILL.md")[0]
+        frozen = ("dfir", "dfir-mem", "dfir-myos", "dfir-pcap")
+        ida = self._texts("skills/security/ida-reverse/SKILL.md", frozen)[0]
+        self.assertNotIn("binary-reading.md", ida)
         for name in ("list_databases", "open_database", "execute_python", "reference", "save_database", "close_database"):
             self.assertIn(name, ida)
         self.assertIn("x64dbg 未接入，不要调用", ida)
         self.assertIn("仅在用户要求保存注释时调用", ida)
         self.assertNotIn("If you modified names/comments/types", ida)
-        apk = self._texts("skills/security/android-malware-analysis/SKILL.md")[0]
+        for name in ("dfir-re", "dfir-max"):
+            enriched = (self.root / name / "skills/security/ida-reverse/SKILL.md").read_text(encoding="utf-8")
+            self.assertEqual(check.forbidden_hits(enriched), [], name)
+            self.assertIn("binary-reading.md", enriched)
+            self.assertIn("x64dbg 未接入，不要调用", enriched)
+        apk = self._texts("skills/security/android-malware-analysis/SKILL.md", ("dfir-mem", "dfir-myos", "dfir-pcap"))[0]
+        self.assertNotIn("re-formats.md", apk)
         self.assertIn("没有运行回执就写未取到", apk)
         self.assertIn("不要调用 thunder-app", apk)
+        for name in ("dfir", "dfir-re", "dfir-max"):
+            one = (self.root / name / "skills/security/android-malware-analysis/SKILL.md").read_text(encoding="utf-8")
+            self.assertEqual(check.forbidden_hits(one), [], name)
+            self.assertIn("没有运行回执就写未取到", one)
+            self.assertIn("不要调用 thunder-app", one)
+            if name == "dfir":
+                self.assertNotIn("re-formats.md", one)
+            else:
+                self.assertIn("re-formats.md", one)
         traffic = self._texts("skills/security/wire-toutetu/SKILL.md")[0]
         self.assertIn("本技能不分析银行流水", traffic)
         self.assertIn("bill-flow-analysis", traffic)
