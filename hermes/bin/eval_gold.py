@@ -27,7 +27,13 @@ NOTES_DIR = Path(r"D:\forensics\cases\notes")
 RUNS_DIR = Path(r"D:\ForensicsAgent\hermes\state\eval_runs")
 # 金标放在模型工作目录之外：模型曾读到 notes\gold-11-20.json 的 hint 直接照抄，评测失效
 DEFAULT_GOLD = Path(r"D:\ForensicsAgent\hermes\state\eval\gold-11-20.json")
+CASE_ROOT = Path(r"D:\forensics\cases")
 SOLVE_LOG = NOTES_DIR / "_solve.log"
+
+MOBILE_REQUIRED = {1, 3, 4, 5, 6, 7, 8}
+COMPUTER_REQUIRED = {1, 2, 6, 7, 8, 9, 10}
+PAPER_SECONDS = {"mobile": 2700, "computer": 3600}
+QUESTION_SECONDS = 720
 
 ANSWER_RE = re.compile(r"^[\s>*\-]*答案\s*[：:]\s*(.+?)\s*$", re.M)
 UNKNOWN_TOKENS = ("UNKNOWN", "未取到", "待确认", "不确定", "N/A", "空", "unknown")
@@ -79,6 +85,54 @@ def read_answer(question: str):
     return ans, "answered"
 
 
+def gold_path_allowed(gold: Path) -> bool:
+    """False when the gold file would be readable as case notes.
+
+    D:\\forensics is a junction to G:\\Forensics on this machine, so compare
+    resolved paths; a missing file never resolves through the junction.
+    """
+    try:
+        resolved = gold.resolve()
+    except OSError:
+        resolved = gold
+    if not gold.exists():
+        parent = gold.parent
+        resolved = (parent.resolve() / gold.name) if parent.exists() else gold
+    roots = [CASE_ROOT]
+    if CASE_ROOT.exists():
+        roots.append(CASE_ROOT.resolve())
+    return not any(root == resolved or root in resolved.parents for root in roots)
+
+
+def paper_gate(summary: dict, paper: str) -> list[str]:
+    """Return failure reasons; an empty list means the paper passed."""
+    fails = []
+    rows = {r["question"]: r for r in summary.get("rows", [])}
+    required = MOBILE_REQUIRED if paper == "mobile" else COMPUTER_REQUIRED
+    wrong = summary.get("wrong", 0)
+    if wrong:
+        fails.append(f"WRONG count {wrong}")
+    for q, r in rows.items():
+        if r["verdict"] == "WRONG":
+            fails.append(f"Q{q} WRONG")
+        if r.get("status") == "TIMEOUT":
+            fails.append(f"Q{q} TIMEOUT")
+        if r.get("seconds") is None:
+            fails.append(f"Q{q} seconds missing")
+        elif r["seconds"] > QUESTION_SECONDS:
+            fails.append(f"Q{q} {r['seconds']}s exceeds {QUESTION_SECONDS}s")
+    for q in required:
+        verdict = rows.get(q, {}).get("verdict")
+        if verdict != "OK":
+            fails.append(f"Q{q} required OK, got {verdict}")
+    if paper == "computer" and rows.get(3, {}).get("verdict") not in ("OK", "UNKNOWN"):
+        fails.append(f"Q3 must be OK or UNKNOWN, got {rows.get(3, {}).get('verdict')}")
+    elapsed = summary.get("elapsed_seconds", 0)
+    if elapsed > PAPER_SECONDS[paper]:
+        fails.append(f"paper {elapsed}s exceeds {PAPER_SECONDS[paper]}s")
+    return fails
+
+
 def read_timings():
     """从 _solve.log 读取 'Q11 | profile | 320s | OK' 这类记录。"""
     out = {}
@@ -110,6 +164,9 @@ def main() -> int:
     NOTES_DIR = notes
 
     gold_path = Path(args.gold)
+    if not gold_path_allowed(gold_path):
+        print("gold 不在允许路径", file=sys.stderr)
+        return 2
     if not gold_path.is_file():
         print(f"gold 不存在: {gold_path}", file=sys.stderr)
         return 2
@@ -150,6 +207,7 @@ def main() -> int:
         })
 
     total = len(rows)
+    wrong = sum(1 for r in rows if r["verdict"] == "WRONG")
     summary = {
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "gold": str(gold_path),
@@ -158,6 +216,7 @@ def main() -> int:
         "answered": answered,
         "unknown": unknown,
         "missing": missing,
+        "wrong": wrong,
         "correct_rate": round(correct / total, 3) if total else 0.0,
         "elapsed_seconds": sum(r["seconds"] or 0 for r in rows),
         "rows": rows,
