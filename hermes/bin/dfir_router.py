@@ -10,6 +10,86 @@ LIB = Path(__file__).resolve().parent.parent / "skill-library" / "anthropic-cybe
 if not (LIB / "index.json").is_file():
     LIB = Path(r"D:\ForensicsAgent\hermes\skill-library\anthropic-cyber")
 TRIVIAL = re.compile(r"^(hi|hello|hey|你好|您好|在吗|谢谢|thanks|ok|继续|好的|/.*)$", re.I)
+
+COMPUTER_MARKERS = ("BitLocker", "恢复密钥", "远程连接", "远程桌面", "vhd", "VHD", "VeraCrypt",
+                    "torrent", "onion", "Tor", "回收站", "删除时间", "4625", "登录失败",
+                    "发件人", "附件", "GPS")
+COMPUTER_INDEX = "device_map.computer.summary.txt"
+IOS_INDEX = "device_map.myos.summary.txt"
+PROBE = r"python -X utf8 D:\ForensicsAgent\hermes\bin\ios_backup_probe.py"
+
+COMPUTER_RULES = (
+    (("GPS", "照片"), "myos-results-analysis",
+     "sqlite_query Any_SingleMail.mfs 锁定发件人与附件后，对附件本体用 PIL 读 EXIF GPS",
+     "不要用 Any_ImageExifInfo 里另一张本地图的坐标"),
+    (("BitLocker", "恢复密钥"), "myos-results-analysis",
+     "sqlite_query Win_BitlockerRecoveryKey.mfs 的 TBL_AF_BITLOCKER_PS_RECOVERYKEY",
+     "不要用密钥文件名或卷 GUID 的末几位"),
+    (("远程连接", "远程桌面"), "myos-results-analysis",
+     "sqlite_query Win_RemoteDesktopInfo.mfs 的成功连接表",
+     "题面没写向日葵时不要先翻 Sunlogin 日志"),
+    (("vhd", "VHD"), "myos-results-analysis",
+     "盘符查挂载记录（注册表 MountedDevices、SetupAPI）或对副本 Mount-Vhd -ReadOnly",
+     "不要手解 BAT/MBR；两次无新字段就写 UNKNOWN 并结束本进程"),
+    (("torrent", "onion", "Tor"), "myos-results-analysis",
+     r"先查 Tor 的 places.sqlite（TorBrowser\Data\Browser\profile.default），再 Win_IDM.mfs",
+     "不要只查 Chrome/Edge/IE"),
+    (("删除时间", "回收站"), "myos-results-analysis",
+     "sqlite_query Win_RecycleBin.mfs；零命中再查该分区 $Recycle.Bin\\$I 的创建时间",
+     "不要重复查已零命中的同一张表"),
+    (("登录失败", "4625"), "myos-results-analysis",
+     "sqlite_query Win_SystemLog.mfs 的 TBL_AF_WINLOG_LOG_SYSLOG，EVENT_ID=4625，账号条件写在 POST_DATA",
+     "不要用 ACCOUNT_NAME 为空判断没有该用户"),
+    (("发件人", "附件"), "myos-results-analysis",
+     "sqlite_query Any_SingleMail.mfs：TBL_AF_SM_MAIL_DETAIL 的 IP_ADDRESS，TBL_AF_SM_MAIL_ATTACH 的 FILE_MD5",
+     "不要解 PST"),
+)
+IOS_RULES = (
+    (("家庭地址",), "ios-backup-ctf",
+     "sqlite_query 当前案件 MApps/GaoDeMap*.mfs 的 TBL_PR_GAODEMAP_GEO_ADDRESS_COLLECT，REMARK=家，丢掉 DELETE_STATUS=1，按时间取最新",
+     "不要在文件系统里搜表名；不要改查通讯录"),
+    (("去过", "区县"), "ios-backup-ctf",
+     f"{PROBE} districts <Photos.sqlite>",
+     "不要解析 ZLOCATIONDATA；全文 0 命中不能换分支"),
+    (("单价", "大麻", "图片"), "ios-backup-ctf",
+     f"{PROBE} trailer <图>",
+     "输出含 D0CF11E0 时不要对 PNG 表面 OCR"),
+    (("礼金", "记账"), "ios-backup-ctf",
+     f"{PROBE} sum-by-uuid <账本.sqlite> <表> <uuid列> <金额列>",
+     "不要使用 SUM(DISTINCT 金额)"),
+    (("facebook", "钥匙串", "网站密码"), "ios-backup-ctf",
+     "只查 MYOS 是否已有该网站的明文凭据表；没有明文就写 UNKNOWN 并停止",
+     "不要在会话里写 keybag"),
+)
+IOS_SKILL_ONLY = ("序列号", "备份密码", "Platform/DeviceInfo")
+EMPTY = {"skill": None, "command": None, "forbid": None, "index_file": None}
+
+
+def _match(rules, text, index_file):
+    low = text.lower()
+    for keys, skill, command, forbid in rules:
+        if any(key.lower() in low for key in keys):
+            return {"skill": skill, "command": command, "forbid": forbid, "index_file": index_file}
+    return None
+
+
+def route(text: str) -> dict:
+    low = text.lower()
+    if any(marker.lower() in low for marker in COMPUTER_MARKERS):
+        return _match(COMPUTER_RULES, text, COMPUTER_INDEX) or dict(EMPTY)
+    found = _match(IOS_RULES, text, IOS_INDEX)
+    if found:
+        return found
+    if any(marker.lower() in low for marker in IOS_SKILL_ONLY):
+        return {"skill": "ios-backup-ctf", "command": None, "forbid": None, "index_file": None}
+    return dict(EMPTY)
+
+
+def format_first_jump_block(jump: dict) -> str:
+    if not jump or not jump.get("command"):
+        return ""
+    return (f"第一跳（本轮第一个取证工具调用必须是下面这条；在此之前只允许读本题索引文件 {jump['index_file']}，"
+            f"不要 skill_view，不要 ls 全盘）：\n{jump['command']}\n禁止：{jump['forbid']}")
 PROFILE_HINT = {
     "myos-results-analysis": "dfir-myos",
     "bill-flow-analysis": "dfir-pcap",
@@ -34,6 +114,9 @@ def text_of(payload):
 
 
 def local_skill(message):
+    routed = route(message).get("skill")
+    if routed:
+        return routed
     low = message.lower()
     if re.search(r"(?:只|先)?(?:总结|汇总).*(?:会话|已确认|已经确认|现有结论)", low):
         return None
@@ -110,6 +193,15 @@ def library_fallback(message):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if len(sys.argv) > 1 and sys.argv[1] in ("--route", "--route-file"):
+        if sys.argv[1] == "--route-file":
+            text = Path(sys.argv[2]).read_text(encoding="utf-8")
+        else:
+            text = sys.stdin.read()
+        print(json.dumps(route(text), ensure_ascii=False))
+        return 0
     try:
         payload = json.load(sys.stdin)
     except (ValueError, OSError):
@@ -120,7 +212,13 @@ def main():
         print("{}")
         return 0
     skill = local_skill(message)
-    if skill:
+    jump = route(message)
+    block = format_first_jump_block(jump)
+    if block:
+        context = (block + " 路径从本题索引文件读取后再填。"
+                   "If unavailable, report that fact rather than inventing tools. "
+                   f"Preferred profile: {PROFILE_HINT.get(skill, 'dfir')}.")
+    elif skill:
         hint = PROFILE_HINT.get(skill, "dfir")
         context = (f"[DFIR local router] Relevant installed skill: `{skill}`. Load it once with skill_view('{skill}') "
                    "when needed for this task; do not repeat a skill read already present in this session. "
