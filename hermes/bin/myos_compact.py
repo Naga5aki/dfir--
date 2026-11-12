@@ -93,7 +93,7 @@ def build_summary(compact):
     return "\n".join(lines) + "\n"
 
 
-async def run(server, notes):
+async def run(server, notes, case_id_arg="", material_id_arg=""):
     params = StdioServerParameters(command=server, args=[], env=None)
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:
@@ -102,15 +102,25 @@ async def run(server, notes):
             open_cases = cases.get("openCases") or []
             if not open_cases:
                 raise RuntimeError("MYOS 没有已打开的案件")
-            primary = cases.get("primaryCaseId")
-            case = next((c for c in open_cases if c.get("caseId") == primary), open_cases[0])
-            case_id = case.get("caseId") or primary
+            if case_id_arg:
+                case = next((c for c in open_cases if c.get("caseId") == case_id_arg), None)
+                if case is None:
+                    raise RuntimeError(f"指定案件未打开: {case_id_arg}")
+            else:
+                primary = cases.get("primaryCaseId")
+                case = next((c for c in open_cases if c.get("caseId") == primary), open_cases[0])
+            case_id = case.get("caseId")
             materials = await call(session, "myos-forensics.query_materials", {"caseId": case_id})
             mats = materials.get("materials") or []
             if not mats:
                 raise RuntimeError("案件没有检材")
             finished = [m for m in mats if str(m.get("frscStatusName", "")).lower() in ("finished", "完成")]
-            material = (finished or mats)[0]
+            if material_id_arg:
+                material = next((m for m in mats if material_id_arg in (m.get("materialId"), m.get("caseMaterialId"))), None)
+                if material is None:
+                    raise RuntimeError(f"指定检材不在案件中: {material_id_arg}")
+            else:
+                material = (finished or mats)[0]
             material_id = material.get("materialId") or material.get("caseMaterialId")
             summary = await call(session, "myos-forensics.query_phone_file_forensics_result_summary", {"caseMaterialId": material_id})
             overview = await call(session, "myos-forensics.query_phone_forensics_results_overview", {"caseMaterialId": material_id})
@@ -147,10 +157,12 @@ async def run(server, notes):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--notes", required=True, help="case notes directory")
+    parser.add_argument("--case-id", default="", help="open case to index; default is the primary case")
+    parser.add_argument("--material-id", default="", help="material to index; default is the first finished one")
     parser.add_argument("--server", default=DEFAULT_SERVER)
     args = parser.parse_args()
     try:
-        asyncio.run(run(args.server, Path(args.notes)))
+        asyncio.run(run(args.server, Path(args.notes), args.case_id, args.material_id))
     except Exception as exc:
         print(f"MYOS compact failed: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 1

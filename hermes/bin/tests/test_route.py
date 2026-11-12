@@ -28,7 +28,8 @@ class RouteTest(unittest.TestCase):
     def test_unit_price_is_trailer(self):
         jump = dfir_router.route("走私物品的单价是每克多少元")
         self.assertIn("trailer", jump["command"])
-        self.assertIn("D0CF11E0", jump["forbid"])
+        self.assertIn("docprice", jump["command"])
+        self.assertIn("OCR", jump["forbid"])
 
     def test_serial_has_skill_but_no_command(self):
         jump = dfir_router.route("写出苹果手机的序列号")
@@ -43,7 +44,10 @@ class RouteTest(unittest.TestCase):
         self.assertNotIn("state\\eval", block)
         self.assertEqual(dfir_router.format_first_jump_block(dfir_router.route("请做手机取证")), "")
 
-    def test_vhd_forbids_hand_parse(self):
+    def test_package_name_uses_apps_probe(self):
+        jump = dfir_router.route("该 APP 的包名是什么")
+        self.assertIn("ios_backup_probe.py apps", jump["command"])
+        self.assertIn("data\\data", jump["forbid"])
         jump = dfir_router.route("计算机中曾挂载的 vhd 非加密分区驱动器号")
         self.assertIn("Mount-Vhd", jump["command"])
         self.assertIn("手解", jump["forbid"])

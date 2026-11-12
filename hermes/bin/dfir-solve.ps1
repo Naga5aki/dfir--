@@ -40,6 +40,8 @@ param(
     [switch]$SkipEvidencePack,
     [switch]$SkipMyos,
     [switch]$SkipEvalGold,
+    [string]$SolveCaseId = '',
+    [string]$SolveMaterialId = '',
     [switch]$DryRun
 )
 
@@ -442,7 +444,7 @@ try {
         }
         if (-not $SkipMyos) {
             if (Test-Path -LiteralPath $pythonMyos) {
-                & $pythonMyos "$bin\myos_compact.py" --notes $notes *> $null
+                & $pythonMyos "$bin\myos_compact.py" --notes $notes --case-id $SolveCaseId --material-id $SolveMaterialId *> $null
                 if ($LASTEXITCODE -ne 0) {
                     Write-Warning "MYOS 分析结果索引生成失败（exit $LASTEXITCODE）；继续用 device_map/证据包兜底。"
                 } elseif (Test-Path -LiteralPath (Join-Path $notes 'device_map.myos.summary.txt')) {
@@ -597,6 +599,9 @@ try {
 
             if ($after -ne $before -and $answerLine -and $answerLine -notmatch 'UNKNOWN|未取到|待确认') {
                 $verdict = 'OK'
+            } elseif ($after -ne $before -and $answerLine -match 'UNKNOWN|未取到|待确认') {
+                # 有证据支撑的 UNKNOWN 是合规收口，不是失败；不要触发重试覆盖它。
+                $verdict = 'UNKNOWN'
             } else {
                 $logText = Get-Content "$notes\_solve-q$q-a$attempt.log" -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
                 $esc = [char]27
