@@ -41,7 +41,9 @@ TRAILING = "。；;,，. )）]】"
 
 
 def norm(value: str) -> str:
-    s = (value or "").strip().strip(TRAILING).strip()
+    s = (value or "").strip()
+    s = s.strip("*`_ ")
+    s = s.strip(TRAILING).strip()
     s = s.replace(" ", "")
     return s
 

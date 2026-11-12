@@ -16,6 +16,13 @@ def row(q, verdict, seconds=100, status="OK"):
     return {"question": q, "verdict": verdict, "seconds": seconds, "status": status}
 
 
+class MatchTest(unittest.TestCase):
+    def test_markdown_emphasis_is_stripped(self):
+        self.assertTrue(eval_gold.match("**170000元**", ["170000元"]))
+        self.assertTrue(eval_gold.match("**com.maicai.freejizhang**", ["com.maicai.freejizhang"]))
+        self.assertTrue(eval_gold.match("`344`", ["344"]))
+
+
 class GoldPathTest(unittest.TestCase):
     def test_gold_inside_notes_is_rejected(self):
         self.assertFalse(eval_gold.gold_path_allowed(Path(r"D:\forensics\cases\notes\gold.json")))

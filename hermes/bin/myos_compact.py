@@ -69,6 +69,7 @@ def build_summary(compact):
         "MYOS 手机取证分析结果索引（只读；由 myos_compact.py 生成）",
         f"caseMaterialId={compact.get('caseMaterialId', '')}",
         f"materialName={compact.get('materialName', '')}",
+        f"mountPath={compact.get('mountPath', '')}",
         f"analysisMode={(compact.get('overview') or {}).get('analysisMode', '')}",
         f"App={compact.get('mfsStats', {}).get('appCount')} 数据项={compact.get('mfsStats', {}).get('totalAppDataCount')} "
         f"取证结果={compact.get('summary', {}).get('forensicResultCount')} 文件={compact.get('summary', {}).get('evidenceFileCount')}",
@@ -124,12 +125,17 @@ async def run(server, notes, case_id_arg="", material_id_arg=""):
             material_id = material.get("materialId") or material.get("caseMaterialId")
             summary = await call(session, "myos-forensics.query_phone_file_forensics_result_summary", {"caseMaterialId": material_id})
             overview = await call(session, "myos-forensics.query_phone_forensics_results_overview", {"caseMaterialId": material_id})
+            try:
+                mount = await call(session, "myos-forensics.query_device_mount_path", {"materialId": material_id})
+            except Exception:
+                mount = {}
 
     compact = {
         "generated": datetime.now().isoformat(timespec="seconds"),
         "caseId": case_id,
         "caseMaterialId": material_id,
         "materialName": overview.get("materialName") or material.get("materialName") or material.get("name"),
+        "mountPath": (mount.get("mountPath") or "").replace("\\\\?\\", ""),
         "materialDir": overview.get("materialDir"),
         "summary": summary,
         "overview": {
