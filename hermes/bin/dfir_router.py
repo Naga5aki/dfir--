@@ -20,8 +20,12 @@ PROBE = r"python -X utf8 D:\ForensicsAgent\hermes\bin\ios_backup_probe.py"
 
 COMPUTER_RULES = (
     (("GPS", "照片"), "myos-results-analysis",
-     "sqlite_query Any_SingleMail.mfs 锁定发件人与附件后，对附件本体用 PIL 读 EXIF GPS",
-     "不要用 Any_ImageExifInfo 里另一张本地图的坐标"),
+     "sqlite_query Any_SingleMail.mfs 的 TBL_AF_SM_MAIL_ATTACH：按发件人取 FILE_PATH，路径=索引里的材料 dir + FILE_PATH，再 "
+     f"{PROBE} exif <该文件>",
+     "不要用 Any_ImageExifInfo 里另一张本地图的坐标；挂载离线时用材料目录下的 attachments"),
+    (("发件人", "附件"), "myos-results-analysis",
+     "sqlite_query Any_SingleMail.mfs：TBL_AF_SM_MAIL_DETAIL 的 IP_ADDRESS，TBL_AF_SM_MAIL_ATTACH 的 FILE_MD5",
+     "不要解 PST"),
     (("向日葵", "sunlogin", "todesk", "远控"), "myos-results-analysis",
      "安装表 + 轮转日志；取「成功接收到公网」后的对端 IP:port",
      "不要把中继、本机公网出口、相邻端口当答案"),
@@ -46,9 +50,6 @@ COMPUTER_RULES = (
     (("登录失败", "4625"), "myos-results-analysis",
      "sqlite_query Win_SystemLog.mfs 的 TBL_AF_WINLOG_LOG_SYSLOG，EVENT_ID=4625，账号条件写在 POST_DATA",
      "不要用 ACCOUNT_NAME 为空判断没有该用户"),
-    (("发件人", "附件"), "myos-results-analysis",
-     "sqlite_query Any_SingleMail.mfs：TBL_AF_SM_MAIL_DETAIL 的 IP_ADDRESS，TBL_AF_SM_MAIL_ATTACH 的 FILE_MD5",
-     "不要解 PST"),
 )
 IOS_RULES = (
     (("序列号",), "ios-backup-ctf",

@@ -2,6 +2,8 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -49,6 +51,27 @@ class ChatImageTest(unittest.TestCase):
             make_backup(root)
             db = root / "private/var/mobile/Containers/Data/Application/com.tencent.xin/Documents/abc123/DB/message_3.sqlite"
             self.assertEqual(ios_backup_probe.chat_password(str(db), "Chat_convhash01"), "mm20241105")
+
+
+class ExifProbeTest(unittest.TestCase):
+    def test_exif_gps_decimal(self):
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as raw:
+            path = Path(raw) / "gps.jpg"
+            img = Image.new("RGB", (8, 8))
+            exif = img.getexif()
+            gps = exif.get_ifd(0x8825)
+            gps[1] = "N"
+            gps[2] = (40.0, 0.0, 40.38)
+            gps[3] = "E"
+            gps[4] = (112.0, 42.0, 0.29)
+            img.save(path, exif=exif)
+            buf = StringIO()
+            with redirect_stdout(buf):
+                ios_backup_probe.exif(str(path))
+        out = buf.getvalue()
+        self.assertIn("40.0112N", out)
+        self.assertIn("112.7001E", out)
 
 
 if __name__ == "__main__":

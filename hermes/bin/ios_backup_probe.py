@@ -338,9 +338,28 @@ def chatpics(root) -> None:
         print("no chat image with an OLE trailer")
 
 
+def exif(path: str) -> None:
+    """Print an image's EXIF GPS as decimal degrees."""
+    from PIL import Image
+
+    image = Image.open(path)
+    gps = image.getexif().get_ifd(0x8825)
+    if not gps or 2 not in gps or 4 not in gps:
+        fail(f"no GPS EXIF in {path}")
+
+    def deg(value):
+        return float(value[0]) + float(value[1]) / 60 + float(value[2]) / 3600
+
+    lat, lon = deg(gps[2]), deg(gps[4])
+    print(f"GPS {lat:.4f}{gps.get(1, 'N')},{lon:.4f}{gps.get(3, 'E')}")
+
+
 def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if len(sys.argv) == 3 and sys.argv[1] == "exif":
+        exif(sys.argv[2])
+        return
     if len(sys.argv) == 3 and sys.argv[1] == "chatpics":
         chatpics(sys.argv[2])
         return

@@ -21,7 +21,8 @@ class RouteTest(unittest.TestCase):
 
     def test_email_photo_is_exif_not_trailer(self):
         jump = dfir_router.route("曾经发送过一张照片，写出 GPS")
-        self.assertIn("EXIF", jump["command"])
+        self.assertIn("EXIF", jump["command"].upper())
+        self.assertIn("exif", jump["command"])
         self.assertNotIn("trailer", jump["command"])
         self.assertNotIn("ocr", jump["command"].lower())
 
