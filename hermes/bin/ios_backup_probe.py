@@ -89,11 +89,39 @@ def trailer(path: str) -> None:
         print("no appended OLE/ZIP")
 
 
+def sum_by_uuid(path: str, table: str, id_column: str, amount_column: str) -> None:
+    for name in (table, id_column, amount_column):
+        if not name.replace("_", "").isalnum():
+            fail(f"unsafe identifier: {name}")
+    db = Path(path)
+    if not db.is_file():
+        fail(f"not a file: {db}")
+    con = sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
+    try:
+        rows = con.execute(
+            f'SELECT "{id_column}", "{amount_column}" FROM "{table}" '
+            f'WHERE "{id_column}" IS NOT NULL AND "{amount_column}" IS NOT NULL'
+        ).fetchall()
+    finally:
+        con.close()
+    seen = {}
+    for row_id, amount in rows:
+        seen.setdefault(str(row_id), int(amount))
+    total = 0
+    for row_id, amount in seen.items():
+        print(f"{row_id}\t{amount}")
+        total += amount
+    print(f"SUM {total}")
+
+
 def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if len(sys.argv) == 6 and sys.argv[1] == "sum-by-uuid":
+        sum_by_uuid(*sys.argv[2:])
+        return
     if len(sys.argv) != 3 or sys.argv[1] not in ("districts", "trailer"):
-        fail("usage: ios_backup_probe.py districts <Photos.sqlite> | trailer <image>")
+        fail("usage: ios_backup_probe.py districts <Photos.sqlite> | trailer <image> | sum-by-uuid <sqlite> <table> <id-column> <amount-column>")
     if sys.argv[1] == "districts":
         districts(sys.argv[2])
     else:
