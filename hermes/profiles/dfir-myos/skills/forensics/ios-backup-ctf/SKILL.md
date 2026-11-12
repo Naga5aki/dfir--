@@ -62,18 +62,12 @@ python -X utf8 D:\ForensicsAgent\hermes\bin\ios_backup_probe.py trailer "<图>"
 
 ### 聊天图片题的通法
 
-凡是「聊天里发来的图片/文件里有什么」的题，按同一条链走，不要猜目录：
+凡是「聊天里发来的图片/文件里有什么」的题，两步收口，不要逐层找文件：
 
-1. 在 MYOS 的 `*.mfs` 里定位消息：`TBL_PR_WEIXIN_IM_*` 找文本命中和图片消息（`MEDIA_TYPE=02`、`md5=`）。文本消息会给出上下文和疑似口令（短字母数字，如 `mm20241105`）。
-2. 用 md5/图片序号在案件挂载根下找到实体：`Containers/Data/Application/<微信容器>/Documents/<hash>/Img/<会话hash>/<序号>.pic`。找不到就用 `bash` 通配 `*/Img/*/<序号>.pic` 一次，不要逐层 `ls`。
-3. 跑 `trailer`。出现 `D0CF11E0` 时，用同一会话的聊天库和表名跑 `docprice`：
+1. `python -X utf8 D:\ForensicsAgent\hermes\bin\ios_backup_probe.py chatpics "<iOS备份根>"`：列出所有尾部带 `D0CF11E0`（OLE 文档）的聊天图片，输出会话 hash。备份根取索引 `mountPath` 行。
+2. `python -X utf8 D:\ForensicsAgent\hermes\bin\ios_backup_probe.py docprice "<iOS备份根>" <会话hash> <品类关键词>`：自动定位图片、从同会话短文本取口令、解密并打印 `PASSWORD`/`ROW`/`PRICE`。价格取 `PRICE` 行，单位为元/克。
 
-```
-python -X utf8 D:\ForensicsAgent\hermes\bin\ios_backup_probe.py docprice "<图>" <品类关键词> "<message_3.sqlite>" "Chat_<会话hash>"
-```
-
-`docprice` 会打印 `PASSWORD`、`ROW`、`PRICE`。价格在输出的 `PRICE` 行，单位为元/克。没有 `D0CF11E0` 才考虑 OCR。
-4. 找不到实体图时，先在 `message_3.sqlite` 的 `Chat_*` 表核对序号，再回到第 2 步；不要对 `TBL_PR_WEIXIN_IM_*` 的图片字段直接做 OCR。
+没有 OLE 尾部的普通图片才考虑 OCR。不要对 `TBL_PR_WEIXIN_IM_*` 的图片字段直接 OCR，不要猜 `Img` 目录层级。
 
 ## 钥匙串
 

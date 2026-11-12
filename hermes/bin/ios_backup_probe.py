@@ -204,31 +204,29 @@ def notes(path: str, keyword: str) -> None:
         fail(f"no note contains {keyword!r}")
 
 
-def docprice(path: str, keyword: str, db_path: str, table: str) -> None:
-    """Read a price from a chat image whose trailer is an encrypted spreadsheet.
+def docprice(root: str, conversation_hash: str, keyword: str) -> None:
+    """One-shot: chat image → password from the same chat → decrypted price row.
 
-    The password is the short alphanumeric message in the same chat. The caller
-    names the message database and chat table; this function does not guess
-    where a vendor stores them.
+    The WeChat container layout (Documents/<id>/Img/<conv>/*.pic, DB/message_3.sqlite,
+    Chat_<conv>) is the iOS WeChat structure, not a case-specific path.
     """
     import io
     import re
     import zipfile
     import msoffcrypto
 
-    data = Path(path).read_bytes()
-    start = data.find(b"\xd0\xcf\x11\xe0")
-    if start < 0:
-        fail("no OLE trailer; nothing to decrypt")
-    con = sqlite3.connect(f"file:{Path(db_path).as_posix()}?mode=ro", uri=True)
-    try:
-        messages = [r[0] for r in con.execute(f'SELECT Message FROM "{table}" ORDER BY CreateTime')]
-    finally:
-        con.close()
-    password = next((str(m).strip() for m in messages if re.fullmatch(r"[A-Za-z0-9]{6,16}", str(m).strip())), "")
-    if not password:
-        fail("no short password text in the chat")
+    image = find_chat_image(root, conversation_hash)
+    if image is None:
+        fail(f"no image with an OLE trailer in conversation {conversation_hash}")
+    print(f"IMAGE {image}")
+    wx_docs = image.parents[2]
+    db = wx_docs / "DB" / "message_3.sqlite"
+    if not db.is_file():
+        fail(f"chat database not found under {wx_docs}")
+    password = chat_password(str(db), f"Chat_{conversation_hash}")
     print(f"PASSWORD {password}")
+    data = image.read_bytes()
+    start = data.find(b"\xd0\xcf\x11\xe0")
     office = msoffcrypto.OfficeFile(io.BytesIO(data[start:]))
     office.load_key(password=password)
     out = io.BytesIO()
@@ -238,7 +236,7 @@ def docprice(path: str, keyword: str, db_path: str, table: str) -> None:
     sheet = book.read("xl/worksheets/sheet1.xml").decode("utf-8")
     target = next((i for i, s in enumerate(strings) if keyword in s), None)
     if target is None:
-        fail(f"no shared string contains {keyword!r}")
+        fail(f"no shared string contains {keyword!r}; strings={strings[:20]}")
     for row in re.findall(r"<row.*?</row>", sheet):
         cells = re.findall(r'<c [^>]*t="s"[^>]*><v>(\d+)</v>', row)
         if not cells or int(cells[0]) != target:
@@ -295,16 +293,64 @@ def device(path: str) -> None:
             print(f"{label} {flat[key]}")
 
 
+def find_chat_image(root, conversation_hash: str):
+    """Return the chat image whose trailer is an OLE/CFB document, or None."""
+    containers = Path(root) / "private" / "var" / "mobile" / "Containers" / "Data" / "Application"
+    if not containers.is_dir():
+        return None
+    for image in containers.glob(f"*/Documents/*/Img/{conversation_hash}/*.pic"):
+        data = image.read_bytes()
+        start = data.find(b"\xd0\xcf\x11\xe0")
+        if start >= 0:
+            return image
+    return None
+
+
+def chat_password(db_path: str, table: str) -> str:
+    """Return the last short alphanumeric message in the chat table."""
+    import re
+
+    con = sqlite3.connect(f"file:{Path(db_path).as_posix()}?mode=ro", uri=True)
+    try:
+        messages = [str(r[0]).strip() for r in con.execute(f'SELECT Message FROM "{table}" ORDER BY CreateTime')]
+    finally:
+        con.close()
+    code = next((m for m in reversed(messages) if re.fullmatch(r"[A-Za-z0-9]{6,16}", m)), "")
+    if not code:
+        fail(f"no short password text in {table}")
+    return code
+
+
+def chatpics(root) -> None:
+    """List chat conversations that contain an image with an OLE/CFB trailer."""
+    containers = Path(root) / "private" / "var" / "mobile" / "Containers" / "Data" / "Application"
+    if not containers.is_dir():
+        fail(f"not an iOS backup root: {root}")
+    found = 0
+    for image in containers.glob("*/Documents/*/Img/*/*.pic"):
+        data_head = image.read_bytes()
+        start = data_head.find(b"\xd0\xcf\x11\xe0")
+        if start < 0:
+            continue
+        found += 1
+        print(f"CONV {image.parent.name}\t{image.name}\t{image.stat().st_size}\tOLE@{start}")
+    if not found:
+        print("no chat image with an OLE trailer")
+
+
 def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if len(sys.argv) == 3 and sys.argv[1] == "chatpics":
+        chatpics(sys.argv[2])
+        return
     if len(sys.argv) == 3 and sys.argv[1] == "device":
         device(sys.argv[2])
         return
     if len(sys.argv) == 4 and sys.argv[1] == "notes":
         notes(sys.argv[2], sys.argv[3])
         return
-    if len(sys.argv) == 6 and sys.argv[1] == "docprice":
+    if len(sys.argv) == 5 and sys.argv[1] == "docprice":
         docprice(*sys.argv[2:])
         return
     if len(sys.argv) >= 3 and sys.argv[1] == "ledger":

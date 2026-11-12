@@ -27,7 +27,7 @@ class RouteTest(unittest.TestCase):
 
     def test_unit_price_is_trailer(self):
         jump = dfir_router.route("走私物品的单价是每克多少元")
-        self.assertIn("trailer", jump["command"])
+        self.assertIn("chatpics", jump["command"])
         self.assertIn("docprice", jump["command"])
         self.assertIn("OCR", jump["forbid"])
 
