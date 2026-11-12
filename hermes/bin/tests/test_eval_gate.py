@@ -67,6 +67,25 @@ class ReadTimingsTest(unittest.TestCase):
         self.assertEqual(timings["1"]["seconds"], 42)
 
 
+class SummaryStatusTest(unittest.TestCase):
+    def test_timeout_status_reaches_the_gate(self):
+        with tempfile.TemporaryDirectory() as raw:
+            notes = Path(raw)
+            gold = notes / "gold.json"
+            gold.write_text(json.dumps({"questions": {"1": {"answer": "X", "accept": ["X"]}}}), encoding="utf-8")
+            (notes / "pending-1.md").write_text("答案：X\n", encoding="utf-8")
+            (notes / "_solve.log").write_text("Q1 | p | 630s | TIMEOUT | attempt=2 | t\n", encoding="utf-8")
+            proc = subprocess.run([PY, str(BIN / "eval_gold.py"), "--gold", str(gold), "--notes", str(notes)],
+                                  capture_output=True, text=True, encoding="utf-8", errors="replace")
+        self.assertEqual(proc.returncode, 0)
+        import re
+        match = re.search(r"([A-Z]:\\[^\r\n]+?\.json)", proc.stdout)
+        self.assertIsNotNone(match, proc.stdout)
+        summary = json.loads(Path(match.group(1)).read_text(encoding="utf-8"))
+        self.assertEqual(summary["rows"][0]["status"], "TIMEOUT")
+        self.assertTrue(eval_gold.paper_gate(summary, "mobile"))
+
+
 class GoldPathTest(unittest.TestCase):
     def test_gold_inside_notes_is_rejected(self):
         self.assertFalse(eval_gold.gold_path_allowed(Path(r"D:\forensics\cases\notes\gold.json")))

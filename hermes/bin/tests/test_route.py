@@ -67,6 +67,22 @@ class RouteTest(unittest.TestCase):
         self.assertIn(".npbk", jump["command"])
         self.assertIn("破解器", jump["forbid"])
 
+    def test_computer_stem_without_marker_is_not_ios(self):
+        jump = dfir_router.route("计算机的序列号是多少？")
+        self.assertNotEqual(jump["skill"], "ios-backup-ctf")
+        self.assertIsNone(jump["command"])
+
+    def test_history_is_not_tor(self):
+        jump = dfir_router.route("分析浏览器 history 记录")
+        self.assertIsNone(jump["command"])
+
+    def test_tor_still_matches_as_word(self):
+        jump = dfir_router.route("Tor 的 places.sqlite 在哪")
+        self.assertIn("places.sqlite", jump["command"])
+
+    def test_profile_hint_covers_ios_skill(self):
+        self.assertEqual(dfir_router.PROFILE_HINT.get("ios-backup-ctf"), "dfir-myos")
+
     def test_cli_route_file(self):
         import subprocess
         import tempfile

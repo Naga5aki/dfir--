@@ -14,6 +14,8 @@ TRIVIAL = re.compile(r"^(hi|hello|hey|你好|您好|在吗|谢谢|thanks|ok|继�
 COMPUTER_MARKERS = ("BitLocker", "恢复密钥", "远程连接", "远程桌面", "vhd", "VHD", "VeraCrypt",
                     "torrent", "onion", "Tor", "回收站", "删除时间", "4625", "登录失败",
                     "发件人", "附件", "GPS")
+COMPUTER_CONTEXT = ("计算机", "电脑", "检材三")
+MOBILE_CONTEXT = ("手机", "检材二", "安卓", "android", "ios", "iphone")
 COMPUTER_INDEX = "device_map.computer.summary.txt"
 IOS_INDEX = "device_map.myos.summary.txt"
 PROBE = r"python -X utf8 D:\ForensicsAgent\hermes\bin\ios_backup_probe.py"
@@ -84,22 +86,32 @@ IOS_SKILL_ONLY = ("备份密码", "Platform/DeviceInfo")
 EMPTY = {"skill": None, "command": None, "forbid": None, "index_file": None}
 
 
+def _hit(key: str, low: str) -> bool:
+    """Substring for Chinese keys; word-boundary for ASCII so Tor != history."""
+    if key.isascii():
+        return re.search(r"(?<![a-z0-9])" + re.escape(key.lower()) + r"(?![a-z0-9])", low) is not None
+    return key.lower() in low
+
+
 def _match(rules, text, index_file):
     low = text.lower()
     for keys, skill, command, forbid in rules:
-        if any(key.lower() in low for key in keys):
+        if any(_hit(key, low) for key in keys):
             return {"skill": skill, "command": command, "forbid": forbid, "index_file": index_file}
     return None
 
 
 def route(text: str) -> dict:
     low = text.lower()
-    if any(marker.lower() in low for marker in COMPUTER_MARKERS):
+    if any(_hit(marker, low) for marker in COMPUTER_MARKERS):
         return _match(COMPUTER_RULES, text, COMPUTER_INDEX) or dict(EMPTY)
+    if any(_hit(c, low) for c in COMPUTER_CONTEXT) and not any(_hit(c, low) for c in MOBILE_CONTEXT):
+        # 计算机语境但无明确题型：不套 iOS 规则、不发明第一跳
+        return dict(EMPTY)
     found = _match(IOS_RULES, text, IOS_INDEX)
     if found:
         return found
-    if any(marker.lower() in low for marker in IOS_SKILL_ONLY):
+    if any(_hit(marker, low) for marker in IOS_SKILL_ONLY):
         return {"skill": "ios-backup-ctf", "command": None, "forbid": None, "index_file": None}
     return dict(EMPTY)
 
@@ -111,6 +123,9 @@ def format_first_jump_block(jump: dict) -> str:
             f"不要 skill_view，不要 ls 全盘）：\n{jump['command']}\n禁止：{jump['forbid']}")
 PROFILE_HINT = {
     "myos-results-analysis": "dfir-myos",
+    "ios-backup-ctf": "dfir-myos",
+    "mobile-ctf-pipeline": "dfir-myos",
+    "android-app-forensics": "dfir-myos",
     "bill-flow-analysis": "dfir-pcap",
     "memory-forensics-local": "dfir-mem",
     "wire-toutetu": "dfir-pcap",

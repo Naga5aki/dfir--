@@ -100,10 +100,14 @@ def build_summary(compact):
             f"dir={mat.get('materialDir')}"
         )
         if mat.get("mountPath") or mat.get("online") is not None:
-            lines.append(
-                f"  mountPath={mat.get('mountPath', '')} online={mat.get('online')}"
-                "（online=False 时原始文件读不出内容，改走插件库）"
-            )
+            state = mat.get("online")
+            if state is None:
+                hint = "online=未知（读文件返回 0 字节即视为离线，改走插件库）"
+            elif state:
+                hint = "online=True"
+            else:
+                hint = "online=False（原始文件读不出内容，改走插件库）"
+            lines.append(f"  mountPath={mat.get('mountPath', '')} {hint}")
         for p in mat.get("plugins") or []:
             schema = "schemaXml=yes" if p.get("schemaXmlExists") else "schemaXml=no"
             lines.append(f"- {p.get('pluginName')} | {p.get('dbPath')} | {schema}")

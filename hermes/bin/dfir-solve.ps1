@@ -556,8 +556,8 @@ try {
         $attemptTurns = $eff.Turns
         $attemptBudget = $eff.Budget
 
-        # 只有普通失败才重试；撞墙/工具阻塞/证据耗尽都是终态
-        while ($attempt -lt 2 -and $verdict -notin @('OK', 'EXHAUSTED', 'TIMEOUT', 'TOOL_BLOCKED', 'BUDGET_EXHAUSTED', 'NO_QUESTION')) {
+        # 只有普通失败才重试；撞墙/工具阻塞/证据耗尽/合规 UNKNOWN 都是终态
+        while ($attempt -lt 2 -and $verdict -notin @('OK', 'UNKNOWN', 'EXHAUSTED', 'TIMEOUT', 'TOOL_BLOCKED', 'BUDGET_EXHAUSTED', 'NO_QUESTION')) {
             $attempt++
             $before = Get-Sig $pending
             $prevText = $prevHint

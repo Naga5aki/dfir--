@@ -208,6 +208,7 @@ def main() -> int:
             "verified": bool(spec.get("verified", False)),
             "seconds": t.get("seconds"),
             "profile": t.get("profile"),
+            "status": t.get("status"),
         })
 
     total = len(rows)
