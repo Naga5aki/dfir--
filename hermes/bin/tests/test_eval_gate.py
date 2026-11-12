@@ -23,6 +23,36 @@ class MatchTest(unittest.TestCase):
         self.assertTrue(eval_gold.match("`344`", ["344"]))
 
 
+class ReadAnswerTest(unittest.TestCase):
+    def test_url_containing_n_slash_a_is_answered(self):
+        with tempfile.TemporaryDirectory() as raw:
+            notes = Path(raw)
+            (notes / "pending-7.md").write_text(
+                "答案：http://suprbaydvdcaynfo4dgdzgxb4zuso7rftlil5yg5kqjefnw4wq4ulcad.onion/attachment.php?aid=4130\n",
+                encoding="utf-8")
+            old = eval_gold.NOTES_DIR
+            eval_gold.NOTES_DIR = notes
+            try:
+                ans, state = eval_gold.read_answer("7")
+            finally:
+                eval_gold.NOTES_DIR = old
+        self.assertEqual(state, "answered")
+        self.assertIn("attachment.php", ans)
+
+    def test_unknown_prefix_still_unknown(self):
+        with tempfile.TemporaryDirectory() as raw:
+            notes = Path(raw)
+            (notes / "pending-5.md").write_text(
+                "答案：UNKNOWN（容器文件已定位线索、密码未取到）\n", encoding="utf-8")
+            old = eval_gold.NOTES_DIR
+            eval_gold.NOTES_DIR = notes
+            try:
+                ans, state = eval_gold.read_answer("5")
+            finally:
+                eval_gold.NOTES_DIR = old
+        self.assertEqual(state, "unknown")
+
+
 class GoldPathTest(unittest.TestCase):
     def test_gold_inside_notes_is_rejected(self):
         self.assertFalse(eval_gold.gold_path_allowed(Path(r"D:\forensics\cases\notes\gold.json")))

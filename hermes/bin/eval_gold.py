@@ -82,7 +82,8 @@ def read_answer(question: str):
     if not hits:
         return None, "no-answer-line"
     ans = hits[-1].strip()
-    if any(tok.lower() in ans.lower() for tok in UNKNOWN_TOKENS):
+    head = norm(ans).lower()
+    if any(head.startswith(tok.lower()) for tok in UNKNOWN_TOKENS):
         return ans, "unknown"
     return ans, "answered"
 
