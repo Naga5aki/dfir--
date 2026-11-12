@@ -53,6 +53,20 @@ class ReadAnswerTest(unittest.TestCase):
         self.assertEqual(state, "unknown")
 
 
+class ReadTimingsTest(unittest.TestCase):
+    def test_timings_follow_notes_dir(self):
+        with tempfile.TemporaryDirectory() as raw:
+            notes = Path(raw)
+            (notes / "_solve.log").write_text("Q1 | dfir-myos | 42s | OK | attempt=1 | t\n", encoding="utf-8")
+            old = eval_gold.NOTES_DIR
+            eval_gold.NOTES_DIR = notes
+            try:
+                timings = eval_gold.read_timings()
+            finally:
+                eval_gold.NOTES_DIR = old
+        self.assertEqual(timings["1"]["seconds"], 42)
+
+
 class GoldPathTest(unittest.TestCase):
     def test_gold_inside_notes_is_rejected(self):
         self.assertFalse(eval_gold.gold_path_allowed(Path(r"D:\forensics\cases\notes\gold.json")))

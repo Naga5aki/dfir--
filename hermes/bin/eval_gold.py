@@ -138,11 +138,12 @@ def paper_gate(summary: dict, paper: str) -> list[str]:
 
 def read_timings():
     """从 _solve.log 读取 'Q11 | profile | 320s | OK' 这类记录。"""
+    log = NOTES_DIR / "_solve.log"
     out = {}
-    if not SOLVE_LOG.is_file():
+    if not log.is_file():
         return out
     # PowerShell Tee-Object 默认写 UTF-16LE，历史上也写过 UTF-8：两种都试
-    raw = SOLVE_LOG.read_bytes()
+    raw = log.read_bytes()
     text = raw.decode('utf-16', 'replace') if raw[:2] in (b'\xff\xfe', b'\xfe\xff') or raw[1:2] == b'\x00' else raw.decode('utf-8', 'replace')
     for line in text.splitlines():
         line = line.replace('\x00', '').strip()
