@@ -72,6 +72,8 @@ def compact_material(material):
     return {
         "materialDirName": material.get("materialDirName"),
         "materialDir": material.get("materialDir"),
+        "mountPath": material.get("mountPath", ""),
+        "online": material.get("online"),
         "integrateForensicsDir": material.get("integrateForensicsDir"),
         "hasFSDataMfs": material.get("hasFSDataMfs"),
         "pluginCount": len(plugins),
@@ -97,6 +99,11 @@ def build_summary(compact):
             f"检材 {mat.get('materialDirName')} | 插件库={mat.get('pluginCount')} | "
             f"dir={mat.get('materialDir')}"
         )
+        if mat.get("mountPath") or mat.get("online") is not None:
+            lines.append(
+                f"  mountPath={mat.get('mountPath', '')} online={mat.get('online')}"
+                "（online=False 时原始文件读不出内容，改走插件库）"
+            )
         for p in mat.get("plugins") or []:
             schema = "schemaXml=yes" if p.get("schemaXmlExists") else "schemaXml=no"
             lines.append(f"- {p.get('pluginName')} | {p.get('dbPath')} | {schema}")
@@ -125,11 +132,27 @@ async def run(server, notes, case_id):
                 "myos-forensics.query_computer_forensics_results_overview",
                 {"caseId": cid},
             )
+            mounts = {}
+            for m in overview.get("materials") or []:
+                name = m.get("materialDirName")
+                if not name:
+                    continue
+                try:
+                    mounts[name] = await call(
+                        session,
+                        "myos-forensics.query_device_mount_path",
+                        {"caseId": cid, "materialName": name},
+                    )
+                except Exception:
+                    mounts[name] = {}
 
     materials = []
     for m in overview.get("materials") or []:
         cm = compact_material(m)
         if cm:
+            mount = mounts.get(m.get("materialDirName"), {})
+            cm["mountPath"] = (mount.get("mountPath") or "").replace("\\\\?\\", "")
+            cm["online"] = mount.get("deviceOnline", mount.get("online"))
             materials.append(cm)
     compact = {
         "generated": datetime.now().isoformat(timespec="seconds"),
