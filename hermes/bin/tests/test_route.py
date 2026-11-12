@@ -48,10 +48,22 @@ class RouteTest(unittest.TestCase):
         jump = dfir_router.route("该 APP 的包名是什么")
         self.assertIn("ios_backup_probe.py apps", jump["command"])
         self.assertIn("data\\data", jump["forbid"])
+
+    def test_vhd_forbids_hand_parse(self):
         jump = dfir_router.route("计算机中曾挂载的 vhd 非加密分区驱动器号")
         self.assertIn("Mount-Vhd", jump["command"])
         self.assertIn("手解", jump["forbid"])
         self.assertIn("BAT", jump["forbid"])
+
+    def test_sunlogin_beats_rdp(self):
+        jump = dfir_router.route("分析向日葵远程连接记录")
+        self.assertIn("成功接收到公网", jump["command"])
+        self.assertNotIn("Win_RemoteDesktopInfo", jump["command"])
+
+    def test_veracrypt_prefers_emulator_backup(self):
+        jump = dfir_router.route("找到 VeraCrypt 加密容器并写出密码")
+        self.assertIn(".npbk", jump["command"])
+        self.assertIn("破解器", jump["forbid"])
 
     def test_cli_route_file(self):
         import subprocess

@@ -459,7 +459,7 @@ try {
             (Get-DomainFromText (Get-QuestionText $_) $_) -eq 'computer'
         }).Count -gt 0
         if ($hasComputer -and -not $SkipMyos -and (Test-Path -LiteralPath $pythonMyos)) {
-            & $pythonMyos "$bin\myos_computer_compact.py" --notes $notes *> $null
+            & $pythonMyos "$bin\myos_computer_compact.py" --notes $notes --case-id $SolveCaseId *> $null
             if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath (Join-Path $notes 'device_map.computer.summary.txt'))) {
                 Write-Host "已生成计算机取证索引：device_map.computer.summary.txt"
             } else {
