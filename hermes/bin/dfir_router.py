@@ -200,7 +200,7 @@ def main():
             text = Path(sys.argv[2]).read_text(encoding="utf-8")
         else:
             text = sys.stdin.read()
-        print(json.dumps(route(text), ensure_ascii=False))
+        print(json.dumps(route(text), ensure_ascii=True))
         return 0
     try:
         payload = json.load(sys.stdin)

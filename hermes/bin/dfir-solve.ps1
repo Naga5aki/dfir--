@@ -161,18 +161,36 @@ function Get-DomainFromText([string]$text, [int]$q) {
     return 'generic'
 }
 
+function Get-Route([string]$text) {
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) ("route-" + [guid]::NewGuid().ToString('N') + ".txt")
+    Set-Content -LiteralPath $tmp -Value $text -Encoding UTF8
+    try {
+        $json = & $python -X utf8 "$bin\dfir_router.py" --route-file $tmp
+        if ($LASTEXITCODE -ne 0 -or -not $json) { return $null }
+        return ($json | ConvertFrom-Json)
+    } finally {
+        Remove-Item -LiteralPath $tmp -ErrorAction SilentlyContinue
+    }
+}
+
 function Get-SkillsForDomain([string]$d, [string]$text) {
     if ($Skills) { return $Skills }
-    switch ($d) {
-        'mobile' { return 'android-app-forensics,mobile-ctf-pipeline' }
+    $routed = Get-Route $text
+    $base = switch ($d) {
+        'mobile' { 'android-app-forensics,mobile-ctf-pipeline' }
         'computer' {
-            if ($text -match 'Windows|windows|注册表|NTUSER|Prefetch|EVTX') {
-                return 'myos-results-analysis,windows-loader,digital-forensics'
+            if ($text -match 'Windows|windows|注册表|NTUSER|Prefetch|EVTX|BitLocker|vhd|VHD') {
+                'myos-results-analysis,windows-loader,digital-forensics'
+            } else {
+                'myos-results-analysis,linux-loader,digital-forensics'
             }
-            return 'myos-results-analysis,linux-loader,digital-forensics'
         }
-        default { return 'myos-results-analysis' }
+        default { 'myos-results-analysis' }
     }
+    if ($routed -and $routed.skill -and $base -notlike "$($routed.skill)*") {
+        return "$($routed.skill),$base"
+    }
+    return $base
 }
 
 function Get-EffectiveBudget([int]$q, [string]$packFile) {
@@ -188,7 +206,7 @@ function Get-EffectiveBudget([int]$q, [string]$packFile) {
 
 function New-Prompt([int]$q, [string]$profile, [string]$text, [string]$prev, [string]$pack,
                     [switch]$Retry, [int]$Turns, [int]$BudgetSec, [string]$CaseNotes,
-                    [string]$Domain, [string]$SkillsArg) {
+                    [string]$Domain, [string]$SkillsArg, $Route = $null) {
     $retryLine = if ($Retry) { "这是重试：只带上一步的具体线索，不要重复上一轮工具迭代的路径枚举；若上一轮指向体检为 0 行/缺库的源，直接跳过并换分支。" } else { "" }
     $prevBlock = if ($prev) { @"
 上一轮遗留内容（文件已归档；只能当线索，必须自行复核后重新取数，禁止原样照抄）：
@@ -199,6 +217,15 @@ $prev
 $pack
 "@ } else { "" }
     $writeBy = [int][math]::Max(2, [math]::Ceiling($Turns / 3.0))
+    $firstJump = ''
+    if ($Route -and $Route.command) {
+        $firstJump = @"
+第一跳（本轮第一个取证工具调用必须是下面这条；在此之前只允许读本题索引文件 $($Route.index_file)，不要 skill_view，不要 ls 全盘）：
+$($Route.command)
+禁止：$($Route.forbid)
+
+"@
+    }
 
     if ($Domain -eq 'computer') {
         $computerIndex = Join-Path $CaseNotes 'device_map.computer.summary.txt'
@@ -213,6 +240,7 @@ $computerIndex
 
 只回答这一题，不要回答其他题。
 
+$firstJump
 $packBlock
 
 $computerBlock
@@ -255,6 +283,7 @@ MYOS 已完成分析结果（优先使用，不要从零重复解析）：
 
 只回答这一题，不要回答其他题。
 
+$firstJump
 $packBlock
 
 $myosBlock
@@ -480,6 +509,7 @@ try {
 
         $qText = Get-QuestionText $q
         $qDomain = Get-DomainFromText $qText $q
+        $qRoute = Get-Route $qText
         $skillsArg = Get-SkillsForDomain $qDomain $qText
         if (-not $qText -and -not $AllowMissingQuestion) {
             $line = "Q$q | $profile | 0s | NO_QUESTION | attempt=0 | $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
@@ -503,8 +533,9 @@ try {
         if ($DryRun) {
             $qState = if ($qText) { 'QUESTION_OK' } else { 'NO_QUESTION' }
             $packState = if ($packFile -and (Test-Path $packFile)) { "$((Get-Item $packFile).Length)B" } else { 'none' }
-            Write-Host ("Q{0} | {1} | domain={2} | skills={3} | turns={4} budget={5}s | complex={6} | {7} | pack={8}" -f `
-                $q, $profile, $qDomain, $skillsArg, $eff.Turns, $eff.Budget, $eff.Complex, $qState, $packState)
+            $first = if ($qRoute -and $qRoute.command) { $qRoute.command } else { 'none' }
+            Write-Host ("Q{0} | {1} | domain={2} | skills={3} | turns={4} budget={5}s | complex={6} | {7} | pack={8} | first={9}" -f `
+                $q, $profile, $qDomain, $skillsArg, $eff.Turns, $eff.Budget, $eff.Complex, $qState, $packState, $first)
             continue
         }
 
@@ -534,7 +565,7 @@ try {
                 New-Item -ItemType Directory -Force -Path $prevDir | Out-Null
                 Move-Item $pending (Join-Path $prevDir ("pending-$q.a{0}.md" -f ($attempt - 1))) -Force
             }
-            $prompt = New-Prompt $q $attemptProfile $qText $prevText $packFile -Retry:($attempt -gt 1) -Turns $attemptTurns -BudgetSec $attemptBudget -CaseNotes $notes -Domain $qDomain -SkillsArg $skillsArg
+            $prompt = New-Prompt $q $attemptProfile $qText $prevText $packFile -Retry:($attempt -gt 1) -Turns $attemptTurns -BudgetSec $attemptBudget -CaseNotes $notes -Domain $qDomain -SkillsArg $skillsArg -Route $qRoute
             $promptFile = Join-Path $notes "_solve-q$q.prompt.txt"
             Set-Content -Path $promptFile -Value $prompt -Encoding UTF8
             $sw = [Diagnostics.Stopwatch]::StartNew()
