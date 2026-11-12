@@ -31,10 +31,11 @@ class RouteTest(unittest.TestCase):
         self.assertIn("docprice", jump["command"])
         self.assertIn("OCR", jump["forbid"])
 
-    def test_serial_has_skill_but_no_command(self):
+    def test_serial_uses_device_probe(self):
         jump = dfir_router.route("写出苹果手机的序列号")
         self.assertEqual(jump["skill"], "ios-backup-ctf")
-        self.assertIsNone(jump["command"])
+        self.assertIn("ios_backup_probe.py device", jump["command"])
+        self.assertIn("机型名", jump["forbid"])
 
     def test_block_names_index_and_omits_gold(self):
         jump = dfir_router.route("写出嫌疑人最新家庭地址")

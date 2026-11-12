@@ -51,6 +51,9 @@ COMPUTER_RULES = (
      "不要解 PST"),
 )
 IOS_RULES = (
+    (("序列号",), "ios-backup-ctf",
+     f"{PROBE} device <iOS备份根>",
+     "不要用 Android 的 device_name 或机型名当序列号"),
     (("家庭地址",), "ios-backup-ctf",
      "sqlite_query 当前案件 MApps/GaoDeMap*.mfs 的 TBL_PR_GAODEMAP_GEO_ADDRESS_COLLECT，REMARK=家，丢掉 DELETE_STATUS=1，按时间取最新",
      "不要在文件系统里搜表名；不要改查通讯录"),
@@ -76,7 +79,7 @@ IOS_RULES = (
      "只查 MYOS 是否已有该网站的明文凭据表；没有明文就写 UNKNOWN 并停止",
      "不要在会话里写 keybag"),
 )
-IOS_SKILL_ONLY = ("序列号", "备份密码", "Platform/DeviceInfo")
+IOS_SKILL_ONLY = ("备份密码", "Platform/DeviceInfo")
 EMPTY = {"skill": None, "command": None, "forbid": None, "index_file": None}
 
 

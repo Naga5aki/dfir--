@@ -250,9 +250,57 @@ def docprice(path: str, keyword: str, db_path: str, table: str) -> None:
     fail(f"no row for {keyword!r}")
 
 
+def device(path: str) -> None:
+    """Print device identity fields from Platform/DeviceInfo (plist or xml)."""
+    import plistlib
+
+    info = Path(path) / "Platform" / "DeviceInfo"
+    data = None
+    source = None
+    for name in ("Manifest.plist", "Manifest.xml"):
+        candidate = info / name
+        if candidate.is_file():
+            raw = candidate.read_bytes()
+            if raw[:8] == b"bplist00":
+                data = plistlib.loads(raw)
+            else:
+                data = plistlib.loads(raw)
+            source = candidate
+            break
+    if data is None:
+        fail(f"no Manifest.plist/xml under {info}")
+    print(f"SOURCE {source}")
+    flat = {}
+
+    def walk(obj):
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                if isinstance(value, (dict, list)):
+                    walk(value)
+                else:
+                    flat[str(key)] = value
+        elif isinstance(obj, list):
+            for item in obj:
+                walk(item)
+
+    walk(data)
+    serial = next((flat[k] for k in ("SerialNumber", "ProductSerialNumber", "serialNumber")
+                   if k in flat and flat[k]), None)
+    if not serial:
+        fail(f"no serial key; keys={sorted(flat)[:20]}")
+    print(f"SERIAL {serial}")
+    for label, key in (("DEVICE_NAME", "DeviceName"), ("UDID", "UniqueDeviceID"),
+                       ("PRODUCT_TYPE", "ProductType"), ("BUILD", "BuildVersion")):
+        if key in flat:
+            print(f"{label} {flat[key]}")
+
+
 def main() -> None:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if len(sys.argv) == 3 and sys.argv[1] == "device":
+        device(sys.argv[2])
+        return
     if len(sys.argv) == 4 and sys.argv[1] == "notes":
         notes(sys.argv[2], sys.argv[3])
         return
