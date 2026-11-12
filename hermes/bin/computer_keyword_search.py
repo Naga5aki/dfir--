@@ -41,6 +41,15 @@ ARTIFACT_HINTS = [
     ("boot", re.compile(r"开机|关机|启动|boot|shutdown|wtmp|last", re.I)),
     ("usb", re.compile(r"usb|设备|u盘|移动硬盘", re.I)),
     ("remote", re.compile(r"向日葵|sunlogin|todesk|raylink|远控|远程控制|公网|端口", re.I)),
+    ("rdp", re.compile(r"远程连接|远程桌面|\bRDP\b|TerminalServices", re.I)),
+    ("bitlocker", re.compile(r"bitlocker|恢复密钥", re.I)),
+    ("vhd", re.compile(r"\.vhd\b|\bvhd\b|虚拟磁盘", re.I)),
+    ("veracrypt", re.compile(r"veracrypt|加密容器", re.I)),
+    ("tor", re.compile(r"torrent|tor browser|洋葱|\.onion", re.I)),
+    ("recycle", re.compile(r"删除时间|回收站", re.I)),
+    ("mail", re.compile(r"邮件|发件人|附件", re.I)),
+    ("gps", re.compile(r"\bgps\b|经纬度|拍摄位置", re.I)),
+    ("logon", re.compile(r"登录失败|失败次数|成功登录", re.I)),
     ("browser", re.compile(r"chrome|chromium|浏览器|密码|口令|keyring|钥匙环|login data", re.I)),
     ("wechat", re.compile(r"微信|wechat|weixin", re.I)),
     ("office", re.compile(r"文档|docx|doc|xlsx|pdf|助记词|wallet|md5|哈希", re.I)),
@@ -56,6 +65,12 @@ PLUGIN_HINTS = {
     "boot": ["Linux_SystemInfo", "Linux_SystemLog"],
     "usb": ["Linux_UsbInfo", "Win_Usb"],
     "remote": ["Linux_InstallSoftWare", "Win_SystemInfo"],
+    "rdp": ["Win_RemoteDesktopInfo"],
+    "bitlocker": ["Win_BitlockerRecoveryKey"],
+    "recycle": ["Win_RecycleBin"],
+    "mail": ["Any_ExchangeMail", "Win_Outlook"],
+    "gps": ["Any_ImageExifInfo"],
+    "logon": ["Win_SystemInfo", "Win_SystemLog"],
     "browser": ["Any_Chrome", "Any_ChromiumBrowser", "Any_Firefox"],
     "wechat": ["Win_WeChat", "Linux_InstallSoftWare"],
     "office": ["FSData", "Any_OfficeMetaInfo", "Any_FileCategory"],
@@ -63,10 +78,29 @@ PLUGIN_HINTS = {
     "vm": [],
 }
 
+ROUTE_NOTES = {
+    "rdp": "Windows「远程连接」先查 Win_RemoteDesktopInfo，不要先翻向日葵日志。",
+    "vhd": "盘符查挂载记录或只读挂载副本；不要手解 dynamic VHD BAT。两次无盘符就写 UNKNOWN。",
+    "bitlocker": "恢复密钥来自 Win_BitlockerRecoveryKey，不要用密钥文件名或卷 GUID 的末几位。",
+    "remote": "仅题面写了向日葵/todesk/远控时才走这条；「成功接收到公网」不是远程桌面的默认答案。",
+    "veracrypt": "密码先找模拟器备份里的聊天，不要先破解容器，也不要仿真开机看桌面。",
+    "tor": "下载地址先查 Tor 的 places.sqlite，不要只查 Chrome。",
+    "logon": "失败次数只数该用户最后一次成功登录之前的失败，不要用最后一次开机代替。",
+}
+
 ARTIFACT_KEYWORDS = {
     "boot": ["开机", "关机", "boot", "shutdown", "wtmp", "BOOT_TIME"],
     "usb": ["USB", "设备", "ThinkPlus"],
     "remote": ["向日葵", "sunlogin", "todesk", "远控", "公网"],
+    "rdp": ["远程连接", "远程桌面", "RDP"],
+    "bitlocker": ["BitLocker", "恢复密钥"],
+    "vhd": ["vhd", "虚拟磁盘"],
+    "veracrypt": ["VeraCrypt", "加密容器"],
+    "tor": ["torrent", "Tor", "onion"],
+    "recycle": ["回收站", "删除时间"],
+    "mail": ["邮件", "发件人", "附件"],
+    "gps": ["GPS", "经纬度"],
+    "logon": ["登录失败", "成功登录"],
     "browser": ["Chrome", "Login Data", "keyring", "密码", "dgy02"],
     "wechat": ["微信", "wechat", "版本"],
     "office": ["MD5", "哈希", "助记词", "docx", "wallet"],
@@ -166,6 +200,18 @@ def suggested_dirs(root: Path):
     for sub in ("var/log", "var/log/sunlogin", "etc", "var/lib/dpkg"):
         if (p2 / sub).exists():
             dirs.append(str(p2 / sub))
+    for part in root.iterdir():
+        if not part.is_dir():
+            continue
+        users = part / "Users"
+        if not users.exists():
+            continue
+        for user in users.iterdir():
+            if not user.is_dir() or user.name.lower() in {"public", "default", "default user", "all users"}:
+                continue
+            for sub in ("Documents", "Desktop", "Downloads", "文档", "桌面", "下载"):
+                if (user / sub).exists():
+                    dirs.append(str(user / sub))
     return dirs
 
 
@@ -207,6 +253,7 @@ def build_plan(question, notes, root):
         "sqlTemplates": sql_templates,
         "grepCommand": grep_cmd,
         "searchKeywords": all_kw,
+        "routeNotes": [ROUTE_NOTES[a] for a in artifacts if a in ROUTE_NOTES],
     }
 
 

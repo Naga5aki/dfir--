@@ -1,9 +1,11 @@
 ---
 name: android-app-forensics
-description: Use when Android userdata/手机检材需按 App 定位数据库、MMKV、缓存、聊天记录或图片证据；含 MYOS 解析库入口与手机取证答题校验规则.
+description: Use when Android userdata (data/data, MMKV, apklist) needs an app database, chat, or image. Not for iOS/iTunes backups — those use ios-backup-ctf.
 ---
 
 # Android App Forensics
+
+检材若是 iPhone / iTunes 备份（`Platform/DeviceInfo`、钥匙串、`Containers/Data/Application`），停止使用本技能，改 `skill_view` `ios-backup-ctf`。下面的 `data\data` 路径只适用于 Android。
 
 AI 主导的 Android 手机检材分析。目标：**先走 MYOS 解析结果，再回落文件系统**，把"猜 App / 猜包名 / 猜表"的轮次压到 0。
 

@@ -21,6 +21,8 @@
 
 ## 2. 题型 → 关键词 → 数据源矩阵
 
+本表是 2025FIC Linux 例题，不是当前试卷。题号含义以题面原文为准。Windows 题（BitLocker、VHD、远程连接、VeraCrypt、Tor、回收站、登录失败）先看 [windows-computer-paper.md](./windows-computer-paper.md)。
+
 | 题型 | 高信号关键词 | L1 插件库/表 | L2/L3 原始位置 | 关键字段/命令 |
 |---|---|---|---|---|
 | 最后开机/关机 | 开机、关机、boot、shutdown、wtmp、BOOT_TIME、最后 | `Linux_SystemInfo.TBL_AF_LINUXSYSINFO_ST_BOOTSHUTDOWN` | `/var/log/wtmp`、`boot.log`、syslog `Booting paravirtualized kernel` | START_TIME/END_TIME；wtmp 384B，u32 tv_sec@340；选项冲突时最多交叉一次 |
@@ -104,7 +106,8 @@ date -d @<epoch> '+%F %T %z'        # 秒；毫秒先 /1000
 ## 4. 搜索纪律（本地模型）
 
 - **先精确、后模糊**：哈希/手机号/域名/题面原词一次命中；零命中再同义词/英文/包名。
-- **两次零命中换分支**：图片 OCR / 加密库 / 嵌套 VM / 文档解析；不要换拼法重试。
+- **两次零命中换分支**：图片 OCR / 加密库 / 嵌套 VM / 文档解析；不要换拼法重试。手解 VHD/BAT/分区表两次无新字段，同样换题，不要继续修偏移。
+- **题面压过例题**：本表和压缩摘要里的「题3/下一题」与题面冲突时，以题面为准，并重读题面文件。
 - **有界**：每次 `timeout`、`-m`、`--include`、`maxdepth`；禁止对 13GB 文档树/12MB syslog 全量读。
 - **命中即停**：拿到字段就写 pending，不要继续逛；连续 2 次无新证据收口。
 - **候选排序**：题面要求的字段 > 日志原句 > 同义候选；同一题最多试 2 个候选，不耗光平台次数。

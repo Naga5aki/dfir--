@@ -71,3 +71,18 @@
 # ---- contest answers and case notes ----
 **/references/2025fic-computer.md
 /reports/2025FIC*.md
+/reports/APK*.md
+
+# ---- 2026-11-12: evidence workspaces and local runtime junk ----
+/forensics/
+/work/
+**/projects.db-shm
+**/projects.db-wal
+**/.curator_backups/
+**/lsp/
+**/runtime/
+**/processes.json
+**/models_dev_cache.etag
+**/.hermes_history
+**/.skills_prompt_snapshot.json
+**/backups/config/config.yaml.good.*

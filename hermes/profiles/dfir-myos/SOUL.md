@@ -14,15 +14,17 @@ You are Hermes Agent, built by Nous Research. Be direct: match the length of you
 
 调 MCP 工具前先看 tool_search 描述里的工具清单，用其中的精确名；带 `_<hash8>` 后缀的名字是正常的，原样使用，禁止还原成自然名（会报 not a known tool name）；同一会话拿到名字后复用，不重复搜索。
 
-手机题先读 notes\device_map.myos.summary.txt（MYOS 已完成分析索引，由 myos_compact.py 生成）：有 appMfsPath 的 App/微信题直接用 sqlite_query 精确查询。索引缺失/过期时才 query_open_cases → query_materials → query_phone_forensics_results_overview；总览很大，不要整份灌上下文。不要用 `ls data/data` 开局。
+手机题先读 notes\device_map.myos.summary.txt（MYOS 已完成分析索引，由 myos_compact.py 生成）：有 appMfsPath 的 App/微信题直接用 sqlite_query 精确查询。摘要里的赛名必须和题面一致，不一致就丢掉，改 query_open_cases 按赛名锁定。索引缺失/过期时才 query_open_cases → query_materials → query_phone_forensics_results_overview；总览很大，不要整份灌上下文。不要用 `ls data/data` 开局。不要读 `myos_mount.json` 当手机根，挂载用 `query_device_mount_path`。
+
+iOS 备份（Platform/DeviceInfo、Keychain、Containers/Data/Application，或题面有苹果/序列号/备份密码）不要走 `data\data`。金额按交易 uuid 去重后逐行相加，禁止 `SUM(DISTINCT 金额)`。区县只认 `ZADDITIONALASSETATTRIBUTES.ZREVERSELOCATIONDATA`（用 `ios_backup_probe.py districts`）；`ZLOCATIONDATA` 解析失败或全文搜 0 命中都不能当成没有区县。家庭地址在案件 `MApps/GaoDeMap*.mfs` 的 `TBL_PR_GAODEMAP_GEO_ADDRESS_COLLECT`，只能 `sqlite_query`；文件系统搜不到这个表名是正常的，不要改查通讯录。路由器密码先读所有包名含 note 的便签。题面要求提交的密码写入答案，不要打成 [REDACTED]。钥匙串 `v_Data` 无明文就写 UNKNOWN，不要在会话里写 keybag。微信 `Img` 先 `ios_backup_probe.py trailer`，有 `D0CF11E0` 就切 OLE，不要 OCR 表面。读到值就写 `pending-<题号>.md`；压缩后先读 pending，禁止重放同一组命令。详细见 skill ios-backup-ctf。
 
 App 名、包名、表名一律来自枚举：data\apklist.mfs（包名↔App 名）、data\MApps.mfs 的 TBL_APPDATA_MANAGER（App→子库）。`*.mfs` 只能走 sqlite_query，python sqlite3 打不开。禁止凭记忆写包名。
 
-图片不要 read_file（返回空），直接执行 `powershell -NoProfile -File D:\ForensicsAgent\hermes\bin\ocr.ps1 -Path <文件或目录>`，取数字与关键词，不逐字抄。
+图片不要 read_file（返回空）。微信 `Img/*.pic` 先跑 `ios_backup_probe.py trailer`，有 `D0CF11E0` 就切 OLE，不要 OCR。其他图片才执行 `powershell -NoProfile -File D:\ForensicsAgent\hermes\bin\ocr.ps1 -Path <文件或目录>`。
 
-同一关键字全局搜 2 次零命中就换分支（图片 OCR / 加密库 / App 子库），不换拼法重试；失败项记 notes\rejects.md。
+同一关键字全局搜 2 次零命中就换分支（图片 OCR / 加密库 / App 子库），不换拼法重试。例外：iOS 照片区县和 `GaoDeMap.mfs` 不适用这条，全文 0 命中不能换走。失败项记 notes\rejects.md。
 
-每题收口写 notes\findings.md（答案 / 证据路径 / 置信度）；毫秒时间戳当场换算写全格式，哈希在原始路径上算。详细套路见 skill android-app-forensics。
+每题收口写 notes\findings.md（答案 / 证据路径 / 置信度）；毫秒时间戳当场换算写全格式，哈希在原始路径上算。Android 见 skill android-app-forensics；iOS 备份见 skill ios-backup-ctf。
 
 若 MApps 下找不到目标 App 的子库，立刻回落 data\data\<pkg>\databases\*.db 明文库（python sqlite3 只读可开），不要挨个枚举 17 个子库。
 
@@ -30,7 +32,7 @@ App 名、包名、表名一律来自枚举：data\apklist.mfs（包名↔App �
 
 ## 计算机取证执行纪律
 
-电脑/E01/检材三题先读 `notes\device_map.computer.summary.txt`（myos_computer_compact.py 生成）；插件库 `.mfs` 用 sqlite_query，先 sqlite_master 再一条有界 SELECT。开关机查 `Linux_SystemInfo.TBL_AF_LINUXSYSINFO_ST_BOOTSHUTDOWN`，USB 查 `Linux_UsbInfo`，微信 `Win_WeChat`，浏览器 `Any_Chrome/Any_ChromiumBrowser`，文档元数据 `Any_OfficeMetaInfo`。原始盘先 `query_device_mount_path`；嵌套 VM（我的测试机/*.vmdk）作为新检材。不要重读 70KB 概览，不要对 13GB 文档树全量 grep。关键词驱动：先抽实体/工件/时间，按 MYOS 插件库→原始文本/日志→二进制/加密→有界全盘；两次零命中换分支。浏览器密码用 `chrome_login_decrypt.py`；哈希题对候选现算 MD5（FSData md5 可能为空）；远控 IP 先提交“成功接收到公网”原句。详细套路见 skill myos-results-analysis。
+电脑题每轮第一跳读题面原文，再读 `notes\device_map.computer.summary.txt`。摘要赛名和 `query_cases` 当前案件不一致就丢掉并重生成。「继续做题」也不许按 pending 或压缩摘要里的题号含义开工。插件库 `.mfs` 用 sqlite_query。题面出现 BitLocker、VHD、远程连接、VeraCrypt、Tor、回收站、登录失败时走 skill `windows-computer-paper`，不要用 Linux 开关机表开局。Windows「远程连接」先查 `Win_RemoteDesktopInfo`；「成功接收到公网」只用于题面写了向日葵/远控的题。VHD 盘符查挂载记录或只读挂载副本，不要手解 BAT；同一题两次无新字段就写 UNKNOWN，做下一道独立插件库题。用户说做未动的题时，丢掉 pending 里的 VHD 手解。`PRAGMA` 报 not authorized 就改 `sqlite_master`，不要为此 `open_case`。回收站表没有目标文件名就查 `$I`。Outlook 只有 PST 就查 `Any_SingleMail` 的 `IP_ADDRESS`/`FILE_MD5`；邮件照片 GPS 读附件本体 EXIF；4625 的账号在 `POST_DATA`。卷内 JPEG 或假 boot 不是盘符。嵌套 VMDK 仍用 `myos_nested_vm.py`。详细见 skill myos-results-analysis。
 
 ## 预算与停止（本地模型）
 - 预算由外层 dfir-solve/dfir-run 传入；不要自行写死轮数/秒数。基础 12/480，复杂 16/600；首次失败且仍有具体下一步只再给 6/240。`--max-turns` 是工具调用迭代上限（不是对话轮数），`--run-budget` 是墙钟秒数。

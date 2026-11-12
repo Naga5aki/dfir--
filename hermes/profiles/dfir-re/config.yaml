@@ -236,3 +236,6 @@ skills:
     - xlsx
     - xurl
     - youtube-content
+onboarding:
+  seen:
+    tool_progress_prompt: true

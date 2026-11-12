@@ -1,6 +1,6 @@
 ---
 name: myos-results-analysis
-description: Use when MYOS已有取证结果需二次分析、查询或关联；含手机与计算机（电脑/E01/磁盘镜像）检材.
+description: Use when MYOS已有取证结果需二次分析、查询或关联；含手机（含 iOS 备份/钥匙串）与计算机（电脑/E01/磁盘镜像、BitLocker、VHD、远程桌面、VeraCrypt、Tor、回收站）检材.
 ---
 
 # MYOS Results Analysis Skill
@@ -11,7 +11,7 @@ description: Use when MYOS已有取证结果需二次分析、查询或关联；
 
 先读已有索引，再补一条缺口。不要重跑取证，不要调用 `ges`。详细卡片见 [myos-secondary-card.md](references/myos-secondary-card.md)。
 
-1. 电脑题先读 `notes\device_map.computer.summary.txt`。手机题先读 `notes\device_map.myos.summary.txt`。没有索引才调用概览，落盘后不要整份读回上下文。电脑和手机分开：电脑第一跳是插件库 `.mfs`；手机第一跳是 `appMfsPath`、`apklist.mfs`、`MApps.mfs`。不要把 `Linux_SystemInfo.TBL_AF_LINUXSYSINFO_ST_BOOTSHUTDOWN` 用到手机题。
+1. 电脑题先读 `notes\device_map.computer.summary.txt`。手机题先读 `notes\device_map.myos.summary.txt`。摘要赛名必须和题面一致，不一致就丢掉，改 `query_open_cases` 按赛名锁定。没有索引才调用概览，落盘后不要整份读回上下文。电脑和手机分开：电脑第一跳是插件库 `.mfs`；手机第一跳是 `appMfsPath`、`apklist.mfs`、`MApps.mfs`。不要把 `Linux_SystemInfo.TBL_AF_LINUXSYSINFO_ST_BOOTSHUTDOWN` 用到手机题。iOS 备份（`Platform/DeviceInfo`、钥匙串、备份密码）不要用 Android 的 `data\data`，也不要读 `myos_mount.json`；先 `skill_view` `ios-backup-ctf`。
 2. 一次只补一个缺口。`.mfs` 先 `sqlite_master`，再一条带 `LIMIT` 的 `SELECT`。禁止 `PRAGMA table_info`。`not authorized` 先核对 caseId 和 mount，不要原样重试。
 3. 搜索命中、文件名、插件标签只是线索。没有当次 `sqlite_query` 或 `query_current_node_data` 回执的句子写成“未取到”，不要写成不存在。同一分支两次零命中就换表或写 pending。
 4. `quick_search_content` 是有界文件搜索。`global_search_content` 会建异步任务，只提交一次，然后 `query_task_status`。不要用它开局。`create_file_index_task`、`decrypt_partition`、`restart_computer_forensics` 会改状态；二次分析请求本身不是授权。
@@ -58,6 +58,8 @@ description: Use when MYOS已有取证结果需二次分析、查询或关联；
 
 ## Computer forensics methodology (keyword-driven)
 
+题面原文压过本节和 [computer-forensics-framework.md](./references/computer-forensics-framework.md) 里的例题。每轮第一跳读题面文件。用户说「未动的题」时，pending 里的 VHD/BAT/偏移计划作废。`sqlite_query` 报 `not authorized` 且语句是 `PRAGMA` 时，改 `sqlite_master` + `SELECT * LIMIT 1`，不要为此 `open_case`。题面出现 BitLocker、VHD、远程连接、VeraCrypt、Tor、回收站、登录失败时，先读 [windows-computer-paper.md](./references/windows-computer-paper.md)，不要用 Linux 开关机表或「成功接收到公网」开局。
+
 1. **拆题**：抽实体（人名/手机号/邮箱/域名/IP/哈希/版本）、工件（开关机/USB/浏览器/微信/远控/文档/音频）、时间（题面时间戳/时区）、格式（单选/多选/简答/选项原文）、检材号五类关键词。
 2. **选层**：L1 MYOS 插件库（最快）→ L2 原始文本/配置/日志 → L3 二进制/加密容器（VMDK/Chrome Login Data/keyring/ZIP/图片/音频）→ L4 有界全盘检索（最后手段）。
 3. **搜词**：先精确值（哈希、手机号、域名、题面原词），再同义词/英文/包名/字段名；SQL 用 `sqlite_master` 定位表和列，再 `LIKE '%kw%'`；文件用 `grep -r -l -m1 --include=...`；二进制用 `grep -a -b`/`strings`；每次记录「范围 + 命中文件/表 + 字段」。可先用 `computer_keyword_search.py --question "<题面>" --notes <notes> --root <Root> --execute --timeout 60` 生成关键词计划和有界命中。
@@ -82,7 +84,8 @@ description: Use when MYOS已有取证结果需二次分析、查询或关联；
    - 浏览器密码：`Any_Chrome`/`Any_ChromiumBrowser` + 钥匙环（常来自手机笔记）；自动取证密码记录可能只有账号。原始 Chrome `Login Data` 的 `v11` 需 GNOME Keyring：`python chrome_login_decrypt.py --login-data <Login Data> --keyring <默认密钥环.keyring> --keyring-password-stdin`（钥匙环密码从 stdin 传，不上 argv）；脚本内部取 `Chrome Safe Storage` → PBKDF2-SHA1 → AES-128-CBC。
    - 文档：`Any_OfficeMetaInfo` 只有元数据无正文。
    - 文件哈希/文件名：`FSData.mfs` / MYOS 哈希检索；不要全盘算哈希。
-   - 远控：`Linux_InstallSoftWare` + `sunlogin*` 轮转日志；按题面时间戳匹配，日志内“成功接收到公网”后是对方公网 IP:port，**优先提交该原句**；不要把同一 IP 的相邻端口、局域网 IP、P2P/relay 服务器当答案；已错 2 个候选就停下复核字段语义。
+   - 远控：仅当题面出现向日葵/sunlogin/todesk/远控软件。`Linux_InstallSoftWare` + `sunlogin*` 轮转日志；按题面时间戳匹配，日志内“成功接收到公网”后是对方公网 IP:port，**优先提交该原句**；不要把同一 IP 的相邻端口、局域网 IP、P2P/relay 服务器当答案；已错 2 个候选就停下复核字段语义。题面只写「远程连接/远程桌面」时改查 `Win_RemoteDesktopInfo`，禁止先读向日葵日志。
+   - Windows 试卷（BitLocker 恢复密钥、VHD 盘符、VeraCrypt、邮件附件、Tor 历史、回收站删除时间、照片 GPS、登录失败次数）走 [windows-computer-paper.md](./references/windows-computer-paper.md)。邮件查 `Any_SingleMail` 的 `IP_ADDRESS`/`FILE_MD5`；邮件照片的 GPS 读附件本体 EXIF；4625 的账号在 `POST_DATA`。VHD 盘符查挂载记录或只读挂载副本，不要手解 BAT。同一题连续两次无新字段就写 UNKNOWN，做下一道不依赖它的插件库题。
 3. 原始文件：`query_device_mount_path(materialId)` → `/c/osmap/.../Root/PartitionN`。**不要用 `myos_mount.json` 的根**（可能指向手机检材）。先看数据盘 `Partition4/home/<user>`、`文档/桌面/下载`；禁止对 13GB 文档树做全量 grep。命中 `我的测试机/`、`虚拟机/`、`.vmware/`、`*.vmdk` 时按嵌套 VM 处理：先 `python myos_nested_vm.py --case-id <id> --vmdk <vmdk> --dry-run` 看计划，确认后 `--yes`（内部 `add_image_material`→`load_case`→`query_device_mount_path`）；不要提交重新取证任务。在 VM 内找便签/浏览器/微信；便签库 `content` 列的 `data:image/...;base64,...` 复制为 PNG 再 OCR。
 4. 文件伪装：`important.docx` 可能是 ZIP（`PK\x03\x04`），解出 XML 后看 `FFD8FFE0`/JFIF 改 `.jpg`；先复制副本，原件只读。音频题先转写；长音频有异常静音分段时取每段首字连读（藏头/谐音）。
 5. 速度：一题一进程；题面从 `questions-*.txt` 读，不要逐题 `get_question`；概览只读一次；连续 2 次无新证据就收口写 pending。

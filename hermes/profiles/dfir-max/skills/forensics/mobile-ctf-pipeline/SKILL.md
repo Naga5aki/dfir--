@@ -1,9 +1,11 @@
 ---
 name: mobile-ctf-pipeline
-description: 手机取证（Android）流水线：索引→定位→取数→收口；含微信 key、图片二维码、VeraCrypt 链.
+description: Use when answering a mobile-forensics contest on Android userdata or an iOS/iTunes backup (iPhone, 序列号, 钥匙串, keychain-backup.plist, 备份密码, Containers/Data/Application).
 ---
 
 # 手机取证流水线（本地模型版）
+
+检材是 iPhone / iTunes 备份时，不要用下面的 Android 路径。先 `skill_view` `ios-backup-ctf`，再做题。
 
 目标：**用最少的轮次拿到原始字段**。每一步都优先"读现成索引"，而不是让模型自己 ls / find。
 
